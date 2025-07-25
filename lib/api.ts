@@ -78,10 +78,9 @@ export const authService = {
 
       const data = await response.json();
 
-      // Guardar el token de acceso
-      //   if (data.session?.access_token) {
-      //     localStorage.setItem("supabase_token", data.session.access_token);
-      //   }
+      // Guardar token en cookies y localStorage
+      document.cookie = `authToken=${data.session.access_token}; path=/; max-age=86400; SameSite=Lax`;
+      localStorage.setItem("authToken", data.session.access_token);
 
       return {
         success: true,

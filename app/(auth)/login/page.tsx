@@ -20,9 +20,9 @@ export default function LoginPage() {
     const result = await authService.login(email, password);
 
     if (result.success && result.data?.session) {
-      // Guardar token en localStorage o cookies
+      // Guardar token en localStorage
       localStorage.setItem("authToken", result.data.session.access_token);
-      router.push("/");
+      router.push("/dashboard");
     } else {
       setError(result.error || "Credenciales incorrectas");
     }

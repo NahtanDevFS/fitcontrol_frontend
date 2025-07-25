@@ -1,0 +1,36 @@
+/* Estilos base para el layout */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor del sidebar móvil */
+.mobile-header {
+  display: none; /* Oculto por defecto */
+  padding: 0.5rem;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+/* Media queries para responsive design */
+@media (max-width: 767px) {
+  .mobile-header {
+    display: block;
+  }
+}
+
+@media (min-width: 640px) {
+  .main-content {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,93 @@
+/* Estilos base del header */
+.header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: auto;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Logo */
+.logo-link {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffe600;
+  text-decoration: none;
+}
+
+/* Acciones de usuario */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #ffe600;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #444444;
+}
+
+/* Botón de tema */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+  background-color: #fff7ae;
+}
+
+.theme-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #ffe600;
+}
+
+/* Modo oscuro */
+.dark .header {
+  background-color: rgb(43, 43, 43);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .logo-link {
+  color: #ffe600;
+}
+
+.dark .user-name {
+  color: #f7fbff;
+}
+
+.dark .theme-toggle:hover {
+  background-color: #504800;
+}
+
+.dark .user-icon,
+.dark .theme-icon {
+  color: #ffe600;
+}
