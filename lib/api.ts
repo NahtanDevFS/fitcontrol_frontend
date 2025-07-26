@@ -49,6 +49,12 @@ export const api = {
   },
 };
 
+export const API_ENDPOINTS = {
+  USUARIO: {
+    BASE: `${API_BASE_URL}/api/usuario`,
+  },
+};
+
 // Funciones específicas para autenticación
 export const authService = {
   login: async (email: string, password: string) => {
@@ -81,6 +87,7 @@ export const authService = {
       // Guardar token en cookies y localStorage
       document.cookie = `authToken=${data.session.access_token}; path=/; max-age=86400; SameSite=Lax`;
       localStorage.setItem("authToken", data.session.access_token);
+      localStorage.setItem("userFitControl", JSON.stringify(data.user));
 
       return {
         success: true,
@@ -114,5 +121,32 @@ export const authService = {
     }
 
     return response;
+  },
+
+  logout: async (): Promise<ApiResponse> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include", // Importante para limpiar cookies
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al cerrar sesión");
+      }
+
+      // Limpiar el token del cliente
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userFitControl");
+      document.cookie =
+        "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+      return { success: true, message: "Sesión cerrada exitosamente" };
+    } catch (error) {
+      console.error("Logout error:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Error desconocido",
+      };
+    }
   },
 };

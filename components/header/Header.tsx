@@ -5,6 +5,7 @@ import { Moon, Sun, User } from "lucide-react";
 import Link from "next/link";
 import "./Header.css";
 import { useTheme } from "../ThemeContext";
+import { API_ENDPOINTS } from "@/lib/api";
 
 export default function Header() {
   //onst [darkMode, setDarkMode] = useState(false);
@@ -12,36 +13,51 @@ export default function Header() {
 
   const { darkMode, toggleDarkMode } = useTheme();
 
-  // Efecto para cargar el modo oscuro y usuario desde localStorage
-  //   useEffect(() => {
-  //     // Cargar preferencia de modo oscuro
-  //     const savedMode = localStorage.getItem("darkMode") === "true";
-  //     setDarkMode(savedMode);
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        // Obtener el usuario del localStorage
+        const userData = localStorage.getItem("userFitControl");
 
-  //     // Cargar nombre de usuario (simulado - reemplaza con tu lógica real)
-  //     const user = localStorage.getItem("userName") || "Usuario";
-  //     setUserName(user);
+        if (userData) {
+          const user = JSON.parse(userData); //usuario del localStorage
 
-  //     // Aplicar clase de modo oscuro al body
-  //     if (savedMode) {
-  //       document.documentElement.classList.add("dark");
-  //     } else {
-  //       document.documentElement.classList.remove("dark");
-  //     }
-  //   }, []);
+          // Si ya tenemos el nombre en localStorage, lo usamos
+          //   if (user.nombre_usuario) {
+          //     setUserName(user.nombre_usuario);
+          //     return;
+          //   }
 
-  // Manejar cambio de modo oscuro
-  //   const toggleDarkMode = () => {
-  //     const newMode = !darkMode;
-  //     setDarkMode(newMode);
-  //     localStorage.setItem("darkMode", String(newMode));
+          // Si no, hacemos la llamada a la API
+          const res = await fetch(API_ENDPOINTS.USUARIO.BASE);
+          const data = await res.json();
 
-  //     if (newMode) {
-  //       document.documentElement.classList.add("dark");
-  //     } else {
-  //       document.documentElement.classList.remove("dark");
-  //     }
-  //   };
+          // Verificamos si la respuesta es un array de usuarios
+          if (Array.isArray(data)) {
+            const usuarioEncontrado = data.find(
+              (usuario) => usuario.id_usuario === user.id
+            );
+
+            if (usuarioEncontrado) {
+              setUserName(usuarioEncontrado.nombre_usuario);
+              // Actualizar localStorage con los nuevos datos
+              localStorage.setItem(
+                "userFitControl",
+                JSON.stringify({
+                  ...user,
+                  nombre: usuarioEncontrado.nombre_usuario,
+                })
+              );
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error al obtener el nombre de usuario:", error);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   return (
     <header className="header">

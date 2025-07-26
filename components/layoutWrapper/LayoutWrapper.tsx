@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import Sidebar, { SidebarMobile } from "@/components/sidebar/Sidebar";
 import "./LayoutWrapper.css";
 import { ThemeProvider } from "../ThemeContext";
+import Header from "../header/Header";
+import Footer from "../footer/Footer";
 
 // Rutas públicas donde NO debe aparecer el sidebar
 const publicRoutes = ["/login", "/register", "/confirmation", "/"];
@@ -30,7 +32,9 @@ export default function LayoutWrapper({
           <div className="mobile-header">
             <SidebarMobile />
           </div>
+          <Header />
           <main className="main-content">{children}</main>
+          <Footer />
         </div>
       </ThemeProvider>
     </div>

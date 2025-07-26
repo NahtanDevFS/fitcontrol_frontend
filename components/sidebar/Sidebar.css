@@ -63,7 +63,7 @@
 
 .sidebar.light .logo,
 .mobile-sidebar.light .logo {
-  color: #ffe600;
+  color: #ffd900;
 }
 
 .sidebar.light .nav-link,
@@ -73,8 +73,8 @@
 
 .sidebar.light .nav-link:hover,
 .mobile-sidebar.light .nav-link:hover {
-  background-color: #f3f4f6;
-  color: #ffe600;
+  background-color: #f3f3f3;
+  color: #ffbb00;
 }
 
 .sidebar.light .separator,
@@ -122,12 +122,55 @@
   margin: 1rem 0;
 }
 
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.dark .logout-button {
+  color: #fff;
+}
+
+.light .logout-button {
+  color: #3a3a3a;
+}
+
+.logout-button:hover {
+  background-color: #ff4a4a;
+  color: #fff;
+}
+
+.dark .logout-button:hover {
+  background-color: #ff4a4a;
+  color: #fff;
+}
+
+.light .logout-button:hover {
+  background-color: #ff4a4a;
+  color: #fff;
+}
+
+.logout-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 /* Sidebar móvil */
 .mobile-menu-button {
   display: flex;
   padding: 0.5rem;
   border: none;
   cursor: pointer;
+  background-color: rgba(255, 255, 255, 1);
 }
 .dark .mobile-menu-button {
   background-color: rgba(32, 32, 32, 0.9);
@@ -144,7 +187,7 @@
 }
 
 .light .menu-icon {
-  color: #ffe600;
+  color: #e2cc00;
 }
 
 .mobile-sidebar-container {

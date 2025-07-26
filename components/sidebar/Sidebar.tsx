@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import "./Sidebar.css";
 import { useTheme } from "@/components/ThemeContext";
+import { authService } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { label: "Home", href: "/dashboard" },
@@ -17,22 +19,17 @@ export default function Sidebar() {
   //const [darkMode, setDarkMode] = useState(false);
 
   const { darkMode } = useTheme();
+  const router = useRouter();
 
-  //   useEffect(() => {
-  //     // Sincronizar con el estado del tema del Header
-  //     const handleStorageChange = () => {
-  //       const mode = localStorage.getItem("darkMode") === "true";
-  //       //setDarkMode(mode);
-  //       document.documentElement.classList.toggle("dark", mode);
-  //     };
-
-  //     // Verificar el tema al cargar
-  //     handleStorageChange();
-
-  //     // Escuchar cambios en el tema
-  //     window.addEventListener("storage", handleStorageChange);
-  //     return () => window.removeEventListener("storage", handleStorageChange);
-  //   }, []);
+  const handleLogout = async () => {
+    const result = await authService.logout();
+    if (result.success) {
+      router.push("/login");
+    } else {
+      console.error(result.error);
+      // Puedes mostrar un mensaje de error al usuario si lo deseas
+    }
+  };
 
   return (
     <>
@@ -48,11 +45,12 @@ export default function Sidebar() {
             </Link>
           ))}
           <div className="separator" />
+          <button onClick={handleLogout} className="logout-button">
+            <LogOut className="logout-icon" />
+            <span>Cerrar sesión</span>
+          </button>
         </nav>
       </aside>
-
-      {/* Sidebar para móviles */}
-      {/*<SidebarMobile darkMode={darkMode} />*/}
     </>
   );
 }
@@ -62,21 +60,15 @@ export function SidebarMobile() {
   const [open, setOpen] = useState(false);
   const { darkMode } = useTheme();
 
-  //   useEffect(() => {
-  //     // Sincronizar con el estado del tema del Header
-  //     const handleStorageChange = () => {
-  //       const mode = localStorage.getItem("darkMode") === "true";
-  //       setDarkMode(mode);
-  //       document.documentElement.classList.toggle("dark", mode);
-  //     };
+  const router = useRouter();
 
-  //     // Verificar el tema al cargar
-  //     handleStorageChange();
-
-  //     // Escuchar cambios en el tema
-  //     window.addEventListener("storage", handleStorageChange);
-  //     return () => window.removeEventListener("storage", handleStorageChange);
-  //   }, []);
+  const handleLogout = async () => {
+    const result = await authService.logout();
+    if (result.success) {
+      setOpen(false); // Cierra el sidebar móvil
+      router.push("/login");
+    }
+  };
 
   return (
     <>
@@ -104,6 +96,10 @@ export function SidebarMobile() {
               </Link>
             ))}
             <div className="separator" />
+            <button onClick={handleLogout} className="logout-button">
+              <LogOut className="logout-icon" />
+              <span>Cerrar sesión</span>
+            </button>
           </nav>
         </aside>
       </div>

@@ -1,0 +1,104 @@
+/* Estilos base del footer */
+.footer {
+  padding: 2rem 1rem;
+  border-top: 1px solid var(--footer-border);
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Contacto */
+.contact-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--footer-title);
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--footer-accent);
+}
+
+.contact-link {
+  color: var(--footer-text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.contact-link:hover {
+  color: var(--footer-accent);
+}
+
+/* Redes sociales */
+.social-links {
+  flex: 1;
+  min-width: 200px;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--footer-text);
+  transition: color 0.2s;
+}
+
+.social-link:hover .social-icon {
+  color: var(--footer-accent);
+}
+
+/* Copyright */
+.copyright {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--footer-border);
+  font-size: 0.875rem;
+  color: var(--footer-text-secondary);
+}
+
+/* Variables para modo claro */
+.light {
+  --footer-bg: #ffffff;
+  --footer-border: #e5e7eb;
+  --footer-text: #4b5563;
+  --footer-text-secondary: #6b7280;
+  --footer-title: #111827;
+  --footer-accent: #e2cc00;
+}
+
+/* Variables para modo oscuro */
+.dark {
+  --footer-bg: rgba(32, 32, 32, 1);
+  --footer-border: rgb(53, 53, 53);
+  --footer-text: #d1d5db;
+  --footer-text-secondary: #9ca3af;
+  --footer-title: #f9fafb;
+  --footer-accent: #ffe600;
+}
