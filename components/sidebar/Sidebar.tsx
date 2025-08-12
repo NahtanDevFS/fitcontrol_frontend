@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { label: "Home", href: "/dashboard" },
   { label: "Rutina", href: "/rutina" },
+  { label: "Meta", href: "/meta" },
   { label: "Dieta", href: "/dieta" },
   { label: "Perfil", href: "/perfil" },
 ];

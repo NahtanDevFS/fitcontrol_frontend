@@ -66,6 +66,10 @@ export default function LoginPage() {
         <p className="register-link">
           ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
         </p>
+        <p className="register-link">
+          ¿Olvidaste tu contraseña?{" "}
+          <a href="/reset-password">Recupérala aquí</a>
+        </p>
       </div>
     </div>
   );
