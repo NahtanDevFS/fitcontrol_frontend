@@ -8,7 +8,14 @@ import Header from "../header/Header";
 import Footer from "../footer/Footer";
 
 // Rutas públicas donde NO debe aparecer el sidebar
-const publicRoutes = ["/login", "/register", "/confirmation", "/"];
+const publicRoutes = [
+  "/login",
+  "/register",
+  "/confirmation",
+  "/",
+  "/reset-password",
+  "/update-password",
+];
 
 export default function LayoutWrapper({
   children,

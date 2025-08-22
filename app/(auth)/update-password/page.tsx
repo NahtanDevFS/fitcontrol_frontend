@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
-import "@/app/(auth)/reset-password/reset-password.css"; // Reutilizamos los mismos estilos
+import "../reset-password/reset-password.css"; // Reutilizamos los mismos estilos
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("");
