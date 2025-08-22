@@ -1,9 +1,9 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL_BACKEND;
 
-interface ApiResponse {
+interface ApiResponse<T = any> {
   success: boolean;
   requiresVerification?: boolean;
-  data?: any;
+  data?: T;
   error?: string;
   message?: string;
 }
@@ -13,42 +13,57 @@ if (!API_BASE_URL) {
     "La variable NEXT_PUBLIC_API_URL_BACKEND no está definida en el entorno."
   );
 }
+// Función genérica para manejar las peticiones fetch
+async function request<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        // Aquí podrías agregar el token de autorización si lo necesitas
+        // 'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        error: `Error del servidor (${response.status})`,
+      }));
+      throw new Error(errorData.error || "Error en la solicitud");
+    }
+
+    // Si la respuesta no tiene contenido (ej. en un DELETE exitoso)
+    if (response.status === 204) {
+      return { success: true };
+    }
+
+    const data = await response.json();
+    // Revisa si la respuesta del backend ya viene envuelta en un objeto { data: ... }
+    // Si no, asume que la respuesta completa es la data.
+    const payload = data.data !== undefined ? data.data : data;
+
+    return { success: true, data: payload };
+  } catch (error) {
+    console.error("API Error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error desconocido",
+    };
+  }
+}
 
 export const api = {
-  async post(endpoint: string, body: any): Promise<ApiResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Error en la solicitud");
-        } else {
-          const errorText = await response.text();
-          throw new Error(
-            `Error del servidor (${response.status}): ${errorText}`
-          );
-        }
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("API Error:", error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Error desconocido",
-      };
-    }
-  },
+  get: <T>(endpoint: string) => request<T>(endpoint, { method: "GET" }),
+  post: <T>(endpoint: string, body: any) =>
+    request<T>(endpoint, { method: "POST", body: JSON.stringify(body) }),
+  put: <T>(endpoint: string, body: any) =>
+    request<T>(endpoint, { method: "PUT", body: JSON.stringify(body) }),
+  delete: <T>(endpoint: string) => request<T>(endpoint, { method: "DELETE" }),
 };
-
 export const API_ENDPOINTS = {
   USUARIO: {
     BASE: `${API_BASE_URL}/api/usuario`,
