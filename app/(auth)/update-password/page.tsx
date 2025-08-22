@@ -57,7 +57,7 @@ export default function UpdatePasswordPage() {
     setLoading(false);
   };
 
-  if (!sessionToken) {
+  if (!session) {
     return (
       <div className="reset-container">
         <div className="reset-form-box">
