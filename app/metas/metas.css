@@ -1,0 +1,175 @@
+/* app/metas/metas.css */
+
+.metas-container {
+  padding: 40px;
+  color: #f3f3f3;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Reutilizamos estilos globales que ya tienes */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 20px;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: #333;
+  color: #f3f3f3;
+  font-size: 1rem;
+}
+
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #ffe70e;
+  color: #333;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #fff491;
+}
+
+.btn-secondary {
+  background-color: #444;
+  color: #f3f3f3;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #aaa;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Estilos específicos del módulo de metas */
+.goal-card {
+  background-color: #2a2a2a;
+  padding: 30px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.goal-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.goal-card p {
+  color: #aaa;
+  margin-bottom: 30px;
+}
+
+.goal-form,
+.update-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.progress-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.progress-details div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-details span {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.progress-details strong {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.progress-details .current-weight strong {
+  color: #ffe70e;
+  font-size: 2rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  background-color: #333;
+  border-radius: 10px;
+  height: 30px;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background-color: #28a745; /* Verde */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+.update-form {
+  border-top: 1px solid #444;
+  padding-top: 30px;
+}
+
+.goal-completed {
+  background: linear-gradient(45deg, #28a745, #228b22);
+}
+
+.goal-completed p {
+  color: #f3f3f3;
+  font-size: 1.1rem;
+}
