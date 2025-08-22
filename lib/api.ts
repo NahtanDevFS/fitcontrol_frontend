@@ -169,8 +169,28 @@ export const authService = {
     return api.post("/auth/reset-password", { email });
   },
 
-  updateUserPassword: async (password: string): Promise<ApiResponse> => {
-    // La autenticación se maneja con el token de la sesión temporal
-    return api.post("/auth/update-password", { password });
+  updateUserPassword: async (
+    password: string,
+    accessToken: string
+  ): Promise<ApiResponse> => {
+    // Necesitamos pasar el token manualmente
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/update-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // --- ESTA ES LA LÍNEA CLAVE ---
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Error en la solicitud");
+
+      return { success: true, ...data };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
   },
 };

@@ -5,26 +5,22 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
-import "../reset-password/reset-password.css"; // Reutilizamos los mismos estilos
+import "./reset-password.css";
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSessionReady, setIsSessionReady] = useState(false); // Para esperar la sesión
+  const [sessionToken, setSessionToken] = useState<string | null>(null); // Estado para guardar el token
   const router = useRouter();
 
   useEffect(() => {
-    // Esperamos a que Supabase procese el token de la URL y cree una sesión
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === "PASSWORD_RECOVERY") {
-          setIsSessionReady(true);
-        }
-        if (event === "SIGNED_IN") {
-          // Puede que se dispare SIGNED_IN también
-          setIsSessionReady(true);
+        // Cuando la sesión de recuperación de contraseña está lista...
+        if (event === "PASSWORD_RECOVERY" && session) {
+          setSessionToken(session.access_token); // ¡Guardamos el token!
         }
       }
     );
@@ -34,11 +30,19 @@ export default function UpdatePasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!sessionToken) {
+      setError(
+        "Sesión inválida o expirada. Por favor, solicita un nuevo enlace."
+      );
+      return;
+    }
+
     setLoading(true);
     setError("");
     setMessage("");
 
-    const result = await authService.updateUserPassword(password);
+    const result = await authService.updateUserPassword(password, sessionToken);
 
     if (result.success) {
       setMessage(
@@ -51,7 +55,7 @@ export default function UpdatePasswordPage() {
     setLoading(false);
   };
 
-  if (!isSessionReady) {
+  if (!sessionToken) {
     return (
       <div className="reset-container">
         <div className="reset-form-box">
@@ -66,10 +70,8 @@ export default function UpdatePasswordPage() {
     <div className="reset-container">
       <div className="reset-form-box">
         <h1>Establecer Nueva Contraseña</h1>
-
         {error && <div className="error-message">{error}</div>}
         {message && <div className="success-message">{message}</div>}
-
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="password">Nueva Contraseña</label>
