@@ -1,66 +1,50 @@
-/* src/app/auth/confirmacion/style.css */
 .confirmation-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #1a1a1a;
+  color: #f3f3f3;
+  padding: 20px;
 }
 
 .confirmation-box {
-  max-width: 500px;
-  width: 90%;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #2a2a2a;
+  padding: 40px;
+  border-radius: 10px;
+  border: 1px solid #444;
   text-align: center;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .confirmation-title {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 1rem;
-  color: #333;
+  margin-bottom: 20px;
 }
 
 .confirmation-message {
-  color: #666;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
+  font-size: 1.1rem;
+  color: #aaa;
+  line-height: 1.6;
+  min-height: 50px; /* Para evitar que el layout salte al cambiar el texto */
 }
 
 .confirmation-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #2563eb;
-  color: white;
+  margin-top: 25px;
+  padding: 12px 25px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
+  background-color: #ffe70e;
+  color: #333;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 .confirmation-button:hover {
-  background-color: #1d4ed8;
-}
-
-/* Estilos para el estado de verificación */
-.confirmation-title::before {
-  content: "";
-  display: inline-block;
-  margin-right: 0.5rem;
-}
-
-/* Estilo para mensajes de error */
-.error-state {
-  color: #dc2626;
-}
-
-/* Estilo para mensajes de éxito */
-.success-state {
-  color: #16a34a;
+  background-color: #fff491;
 }
