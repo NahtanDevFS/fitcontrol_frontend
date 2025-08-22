@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { authService } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import "../reset-password/reset-password.css";
+import { Session } from "@supabase/supabase-js";
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("");
@@ -13,6 +14,7 @@ export default function UpdatePasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null); // Estado para guardar el token
+  const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function UpdatePasswordPage() {
       (event, session) => {
         // Cuando la sesión de recuperación de contraseña está lista...
         if (event === "PASSWORD_RECOVERY" && session) {
-          setSessionToken(session.access_token); // ¡Guardamos el token!
+          setSession(session); // ¡Guardamos el token!
         }
       }
     );
@@ -31,7 +33,7 @@ export default function UpdatePasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!sessionToken) {
+    if (!session) {
       setError(
         "Sesión inválida o expirada. Por favor, solicita un nuevo enlace."
       );
@@ -42,7 +44,7 @@ export default function UpdatePasswordPage() {
     setError("");
     setMessage("");
 
-    const result = await authService.updateUserPassword(password, sessionToken);
+    const result = await authService.updateUserPassword(password, session);
 
     if (result.success) {
       setMessage(

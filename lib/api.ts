@@ -8,6 +8,8 @@ interface ApiResponse<T = any> {
   message?: string;
 }
 
+import { Session } from "@supabase/supabase-js";
+
 if (!API_BASE_URL) {
   throw new Error(
     "La variable NEXT_PUBLIC_API_URL_BACKEND no está definida en el entorno."
@@ -171,26 +173,13 @@ export const authService = {
 
   updateUserPassword: async (
     password: string,
-    accessToken: string
+    session: Session
   ): Promise<ApiResponse> => {
-    // Necesitamos pasar el token manualmente
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/update-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // --- ESTA ES LA LÍNEA CLAVE ---
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error en la solicitud");
-
-      return { success: true, ...data };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
+    // El backend necesita el access_token y refresh_token para establecer la sesión
+    return api.post("/auth/update-password", {
+      password,
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
   },
 };
