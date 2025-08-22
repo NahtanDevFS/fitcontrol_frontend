@@ -43,3 +43,10 @@ export interface Musculo {
   id_grupo: number;
   nombre_musculo: string;
 }
+
+export interface CumplimientoRutina {
+  id_cumplimiento_rutina: number;
+  id_rutina_dia_semana: number;
+  fecha_a_cumplir: string; // formato YYYY-MM-DD
+  cumplido: boolean;
+}
