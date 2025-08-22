@@ -35,7 +35,7 @@ export default function ConfirmacionPage() {
             // Si todo fue exitoso, actualizamos la UI.
             setIsVerified(true);
             setMessage(
-              "¡Correo verificado exitosamente! Redirigiendo a tu dashboard..."
+              "¡Correo verificado exitosamente! Redirigiendo a inicio de sesión..."
             );
 
             // Programamos la redirección.
@@ -70,7 +70,7 @@ export default function ConfirmacionPage() {
             onClick={() => router.push("/dashboard")}
             className="confirmation-button"
           >
-            Ir al Dashboard
+            Ir al inicio de sesión
           </button>
         )}
       </div>

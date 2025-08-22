@@ -8,7 +8,14 @@ export function middleware(request: NextRequest) {
     request.headers.get("authorization")?.split(" ")[1]; // También verifica el header
 
   // Rutas públicas que no requieren autenticación
-  const publicRoutes = ["/login", "/register", "/confirmation", "/"];
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/confirmation",
+    "/",
+    "/reset-password",
+    "/update-password",
+  ];
 
   // Excluir archivos estáticos y de imagen
   const staticFiles = [

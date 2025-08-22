@@ -164,4 +164,13 @@ export const authService = {
       };
     }
   },
+
+  sendPasswordResetEmail: async (email: string): Promise<ApiResponse> => {
+    return api.post("/auth/reset-password", { email });
+  },
+
+  updateUserPassword: async (password: string): Promise<ApiResponse> => {
+    // La autenticación se maneja con el token de la sesión temporal
+    return api.post("/auth/update-password", { password });
+  },
 };
