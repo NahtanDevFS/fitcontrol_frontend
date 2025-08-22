@@ -29,7 +29,7 @@ export default function ResetPasswordPage() {
       <div className="reset-form-box">
         <h1>Recuperar Contraseña</h1>
         <p className="reset-subtitle">
-          Ingresa tu correo y te enviaremos un enlace para recuperar tu cuenta.
+          Ingresa tu correo y te llegará un enlace para recuperar tu cuenta.
         </p>
 
         {message && <div className="success-message">{message}</div>}
