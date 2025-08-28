@@ -10,7 +10,7 @@ export interface RutinaDiaEjercicio {
   id_rutina_dia_semana_ejercicio?: number;
   id_rutina_dia_semana?: number;
   id_ejercicio: number | null;
-  ejercicio?: Ejercicio; // Para poblar con datos del ejercicio
+  ejercicio?: Ejercicio;
   repeticiones: number;
   series: number;
   peso_ejercicio?: number | null;
@@ -48,5 +48,43 @@ export interface CumplimientoRutina {
   id_cumplimiento_rutina: number;
   id_rutina_dia_semana: number;
   fecha_a_cumplir: string; // formato YYYY-MM-DD
+  cumplido: boolean;
+}
+
+// --- NUEVOS TIPOS PARA EL MÓDULO DE DIETA ---
+
+export interface AlimentoDetalle {
+  id_dieta_alimento_detalle?: number;
+  id_dieta_alimento?: number;
+  nombre_alimento: string;
+  calorias_alimento: number;
+  proteina_alimento: number;
+  grasas_alimento: number;
+  carbohidratos_alimento: number;
+  gramos_alimento: number;
+}
+
+export interface TiempoComida {
+  id_dieta_alimento?: number;
+  id_dieta: number;
+  tiempo_comida: string;
+  dia_semana: string;
+  alimentos: AlimentoDetalle[];
+}
+
+export interface Dieta {
+  id_dieta: number;
+  id_usuario: string;
+  nombre_dieta: string;
+  // Usamos un objeto anidado para un acceso más fácil: dias['Lunes']['Desayuno']
+  dias: { [key: string]: { [key: string]: TiempoComida } };
+}
+
+export interface CumplimientoDietaDia {
+  id: number;
+  id_usuario: string;
+  id_dieta: number;
+  fecha_a_cumplir: string; // formato YYYY-MM-DD
+  dia_semana: string;
   cumplido: boolean;
 }

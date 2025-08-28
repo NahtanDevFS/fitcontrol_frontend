@@ -1,0 +1,174 @@
+/* app/gasto-energetico/gasto-energetico.css */
+
+.ge-container {
+  padding: 40px;
+  color: #f3f3f3;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Reutilizamos estilos globales que ya tienes */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 20px;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: #333;
+  color: #f3f3f3;
+  font-size: 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+  gap: 8px; /* Espacio para iconos si los hubiera */
+}
+
+.btn-primary {
+  background-color: #ffe70e;
+  color: #333;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #fff491;
+}
+
+.btn-secondary {
+  background-color: #444;
+  color: #f3f3f3;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos específicos del módulo */
+.calculation-card {
+  background-color: #2a2a2a;
+  padding: 30px;
+  border-radius: 10px;
+  border: 1px solid #444;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 20px;
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.calculation-card button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Estilos de la vista de resultados */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-card {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 25px;
+  text-align: center;
+}
+
+.result-card.main-result {
+  background: linear-gradient(45deg, #ffe70e, #f0d80d);
+  color: #333;
+}
+
+.result-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: #aaa;
+}
+.result-card.main-result h3,
+.result-card.main-result small {
+  color: #5c5000;
+}
+
+.result-card .calorie-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.result-card.main-result .calorie-value {
+  font-size: 3.5rem;
+}
+
+.result-card .calorie-value span {
+  font-size: 1rem;
+  font-weight: normal;
+  color: #aaa;
+}
+
+.result-card.main-result .calorie-value span {
+  color: #5c5000;
+}
+
+.result-card small {
+  margin-top: 5px;
+  display: block;
+  color: #888;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}

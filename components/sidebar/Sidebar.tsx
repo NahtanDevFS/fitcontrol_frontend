@@ -12,6 +12,7 @@ const navItems = [
   { label: "Home", href: "/dashboard" },
   { label: "Rutina", href: "/rutina" },
   { label: "Meta", href: "/metas" },
+  { label: "Mi gasto energético", href: "/gasto-energetico" },
   { label: "Dieta", href: "/dieta" },
   { label: "Perfil", href: "/perfil" },
 ];

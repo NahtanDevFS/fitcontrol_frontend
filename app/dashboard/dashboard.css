@@ -1,0 +1,111 @@
+/* app/dashboard/dashboard.css */
+
+.dashboard-container {
+  padding: 40px;
+  color: #f3f3f3;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.dashboard-header p {
+  font-size: 1.2rem;
+  color: #aaa;
+}
+
+/* Cuadrícula de tarjetas */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* Estilo de cada tarjeta */
+.dashboard-card {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #f3f3f3;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border-bottom: 1px solid #444;
+}
+
+.card-icon {
+  font-size: 2rem;
+  background-color: #333;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.card-content {
+  padding: 25px;
+  flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible */
+}
+
+.card-metric {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffe70e;
+  margin: 0 0 10px 0;
+}
+
+.metric-subtitle {
+  font-size: 1rem;
+  font-weight: normal;
+  color: #aaa;
+}
+
+.card-description {
+  color: #ccc;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.card-footer {
+  padding: 15px 20px;
+  margin-top: auto; /* Empuja el footer hacia abajo */
+  text-align: right;
+  font-weight: bold;
+  color: #ffe70e;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.dashboard-card:hover .card-footer {
+  opacity: 1;
+}
