@@ -494,3 +494,41 @@ html.dark {
     font-size: 3.5rem; /* Hacemos el contador de racha un poco más grande también */
   }
 }
+
+/*SECCIÓN RESPONSIVE*/
+/* Estilos para pantallas de 400px o menos */
+@media (max-width: 400px) {
+  .rutinas-container {
+    padding: 10px; /* Menos padding en los bordes */
+  }
+
+  .page-header {
+    flex-direction: column; /* Apila el título y el botón */
+    gap: 15px;
+    align-items: stretch; /* Estira el botón al 100% */
+  }
+
+  .page-header h1 {
+    font-size: 2rem; /* Título más pequeño */
+  }
+
+  .rutinas-grid {
+    grid-template-columns: 1fr; /* Una sola columna para las tarjetas */
+    gap: 15px;
+  }
+
+  .tracker-container,
+  .streak-container {
+    padding: 15px; /* Menos padding en los trackers */
+  }
+
+  .tracker-container h3,
+  .streak-counter h3 {
+    font-size: 1.3rem; /* Títulos más pequeños */
+  }
+
+  .exercise-details {
+    min-width: 100px; /* Hacemos más pequeña esta sección */
+    text-align: right;
+  }
+}

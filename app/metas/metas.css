@@ -203,3 +203,37 @@ html.dark {
   color: #f3f3f3;
   font-size: 1.1rem;
 }
+
+/* SECCIÓN RESPONSIVE */
+/* Estilos para pantallas de 400px o menos */
+@media (max-width: 400px) {
+  .metas-container {
+    padding: 15px; /* Menos padding general */
+  }
+
+  .page-header h1 {
+    font-size: 2rem; /* Título más pequeño */
+  }
+
+  .goal-card {
+    padding: 20px; /* Menos padding en la tarjeta principal */
+  }
+
+  .goal-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .progress-details {
+    flex-direction: column; /* Apila los pesos verticalmente */
+    gap: 20px; /* Espacio entre los pesos apilados */
+    align-items: center;
+  }
+
+  .progress-details strong {
+    font-size: 1.3rem;
+  }
+
+  .progress-details .current-weight strong {
+    font-size: 1.8rem;
+  }
+}

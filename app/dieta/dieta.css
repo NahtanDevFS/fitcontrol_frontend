@@ -525,3 +525,39 @@ html.dark {
     font-size: 3.5rem;
   }
 }
+
+/* NUEVA SECCIÓN RESPONSIVE  */
+/* Estilos para pantallas de 400px o menos */
+@media (max-width: 400px) {
+  .dieta-container {
+    padding: 10px; /* Menos padding general */
+  }
+
+  .page-header h1 {
+    font-size: 2rem; /* Título más pequeño */
+  }
+
+  .tracker-container,
+  .streak-container {
+    padding: 15px; /* Menos padding en los trackers */
+  }
+
+  .streak-days {
+    font-size: 2.5rem; /* Contador de racha más compacto */
+  }
+
+  .calendar-day {
+    height: 35px; /* Círculos del calendario más pequeños */
+    width: 35px;
+    font-size: 0.8rem;
+  }
+
+  .dieta-grid {
+    grid-template-columns: 1fr; /* Una sola columna para los días */
+    gap: 10px;
+  }
+
+  .food-item-actions > span {
+    display: none; /* Ocultamos las kcal en la lista para dar más espacio */
+  }
+}

@@ -6,6 +6,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background-color 0.3s;
 }
 
 .header-container {
@@ -23,6 +24,7 @@
   font-weight: bold;
   color: #ffc70e;
   text-decoration: none;
+  transition: font-size 0.3s;
 }
 
 /* Acciones de usuario */
@@ -30,6 +32,7 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  transition: gap 0.3s;
 }
 
 .user-info {
@@ -47,6 +50,9 @@
 .user-name {
   font-weight: 500;
   color: #444444;
+  /* Añadimos transición para que el ocultado sea suave */
+  transition: opacity 0.3s, width 0.3s;
+  white-space: nowrap; /* Evita que el nombre se parta en dos líneas */
 }
 
 /* Botón de tema */
@@ -57,6 +63,9 @@
   padding: 0.5rem;
   border-radius: 50%;
   transition: background-color 0.2s;
+  display: flex; /* Para centrar el ícono */
+  align-items: center;
+  justify-content: center;
 }
 
 .theme-toggle:hover {
@@ -90,4 +99,20 @@
 .dark .user-icon,
 .dark .theme-icon {
   color: #ffe600;
+}
+/* Estilos para pantallas de 400px o menos */
+@media (max-width: 400px) {
+  /* Reducimos el espacio entre los botones de acción */
+  .user-actions {
+    gap: 0.75rem;
+  }
+
+  /* Reducimos un poco el tamaño del logo */
+  .logo-link {
+    font-size: 1.25rem;
+  }
+
+  .theme-toggle {
+    margin-right: 10px;
+  }
 }

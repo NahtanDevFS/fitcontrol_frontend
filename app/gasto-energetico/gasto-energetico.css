@@ -203,3 +203,42 @@ html.dark {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
 }
+
+/* NUEVA SECCIÓN RESPONSIVE */
+/* Estilos para pantallas de 400px o menos */
+@media (max-width: 400px) {
+  .ge-container {
+    padding: 15px; /* Reducimos el padding general */
+  }
+
+  .page-header h1 {
+    font-size: 1.4rem; /* Título más pequeño */
+  }
+
+  .calculation-card,
+  .result-card {
+    padding: 20px; /* Menos padding en las tarjetas */
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr; /* Forzamos una columna en el formulario */
+  }
+
+  .result-card .calorie-value {
+    font-size: 1.5rem;
+  }
+
+  .result-card.main-result .calorie-value {
+    font-size: 2.5rem;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 12px 20px;
+    margin-left: 10px;
+  }
+
+  .result-card h3 {
+    font-size: 1.1rem;
+  }
+}

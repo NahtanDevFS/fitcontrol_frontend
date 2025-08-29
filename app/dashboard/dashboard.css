@@ -25,7 +25,6 @@ html.dark {
 }
 
 /* --- 2. ESTILOS DEL DASHBOARD USANDO VARIABLES --- */
-/* (El resto de los estilos ahora usan var() para tomar los colores del tema) */
 
 .dashboard-container {
   padding: 40px;
@@ -147,4 +146,34 @@ html.dark {
 
 .dashboard-card:hover .card-footer {
   opacity: 1;
+}
+
+/* SECCIÓN RESPONSIVE */
+/* Estilos para pantallas de 400px o menos */
+@media (max-width: 400px) {
+  .dashboard-container {
+    padding: 20px; /* Reducimos el padding general */
+  }
+
+  .dashboard-header h1 {
+    font-size: 2rem; /* Hacemos el título más pequeño */
+  }
+
+  .dashboard-header p {
+    font-size: 1rem; /* Hacemos el subtítulo más pequeño */
+  }
+
+  .dashboard-grid {
+    /* Hacemos que la tarjeta ocupe más espacio disponible */
+    grid-template-columns: 1fr;
+    gap: 20px; /* Reducimos el espacio entre tarjetas */
+  }
+
+  .card-content {
+    padding: 20px; /* Menos padding dentro de las tarjetas */
+  }
+
+  .card-metric {
+    font-size: 1.8rem; /* Hacemos la métrica un poco más pequeña */
+  }
 }
