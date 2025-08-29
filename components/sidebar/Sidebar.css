@@ -63,7 +63,7 @@
 
 .sidebar.light .logo,
 .mobile-sidebar.light .logo {
-  color: #ffd900;
+  color: #ffc70e;
 }
 
 .sidebar.light .nav-link,
@@ -234,6 +234,37 @@
 
 .mobile-sidebar-container.open .mobile-sidebar {
   transform: translateX(0);
+}
+
+/* ESTILOS PARA EL ENLACE ACTIVO */
+
+/* Modo Oscuro - Enlace Activo */
+.sidebar.dark .nav-link.active,
+.mobile-sidebar.dark .nav-link.active {
+  background-color: #ffe600;
+  color: #1a1a1a; /* Texto oscuro para que contraste con el fondo amarillo */
+  font-weight: 700; /* Hacemos la letra un poco más gruesa */
+}
+
+/* Modo Claro - Enlace Activo */
+.sidebar.light .nav-link.active,
+.mobile-sidebar.light .nav-link.active {
+  background-color: #ffc70e;
+  color: #333;
+  font-weight: 700;
+}
+
+/* Para evitar que el hover sobreescriba el estilo activo */
+.sidebar .nav-link.active:hover,
+.mobile-sidebar .nav-link.active:hover {
+  /* Mantenemos los mismos colores que el estado activo */
+  background-color: #ffe600;
+  color: #1a1a1a;
+}
+.sidebar.light .nav-link.active:hover,
+.mobile-sidebar.light .nav-link.active:hover {
+  background-color: #ffc70e;
+  color: #333;
 }
 
 @media (min-width: 768px) {

@@ -1,8 +1,38 @@
 /* app/gasto-energetico/gasto-energetico.css */
 
+/*DEFINICIÓN DE COLORES PARA LOS TEMAS*/
+:root {
+  --background-color: #f0f2f5;
+  --card-background-color: #ffffff;
+  --text-primary-color: #1a1a1a;
+  --text-secondary-color: #65676b;
+  --border-color: #e0e0e0;
+  --input-background-color: #f0f2f5;
+  --accent-color: #ffc70e;
+  --accent-color-text: #ffffff;
+  --main-result-bg: linear-gradient(45deg, #ffc70e, #ffbb00);
+  --main-result-text: #ffffff;
+  --main-result-secondary-text: #fffbe2;
+}
+
+html.dark {
+  --background-color: #18191a;
+  --card-background-color: #2a2a2a;
+  --text-primary-color: #f3f3f3;
+  --text-secondary-color: #aaa;
+  --border-color: #444;
+  --input-background-color: #333;
+  --accent-color: #ffe70e;
+  --accent-color-text: #333;
+  --main-result-bg: linear-gradient(45deg, #ffe70e, #f0d80d);
+  --main-result-text: #333;
+  --main-result-secondary-text: #6b5d00;
+}
+
 .ge-container {
   padding: 40px;
-  color: #f3f3f3;
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
   max-width: 900px;
   margin: 0 auto;
 }
@@ -13,7 +43,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 20px;
 }
 
@@ -37,11 +67,11 @@
 .form-group select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #555;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   box-sizing: border-box;
-  background-color: #333;
-  color: #f3f3f3;
+  background-color: var(--input-background-color);
+  color: var(--text-primary-color);
   font-size: 1rem;
 }
 
@@ -60,19 +90,19 @@
 }
 
 .btn-primary {
-  background-color: #ffe70e;
-  color: #333;
+  background-color: var(--accent-color);
+  color: var(--accent-color-text);
 }
 .btn-primary:hover:not(:disabled) {
   background-color: #fff491;
 }
 
 .btn-secondary {
-  background-color: #444;
-  color: #f3f3f3;
+  background-color: var(--border-color);
+  color: var(--text-primary-color);
 }
 .btn-secondary:hover:not(:disabled) {
-  background-color: #555;
+  background-color: #bdbdbd;
 }
 
 .btn:disabled {
@@ -82,10 +112,11 @@
 
 /* Estilos específicos del módulo */
 .calculation-card {
-  background-color: #2a2a2a;
+  background-color: var(--card-background-color);
   padding: 30px;
   border-radius: 10px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s;
 }
 
 .form-grid {
@@ -117,27 +148,27 @@
 }
 
 .result-card {
-  background-color: #2a2a2a;
-  border: 1px solid #444;
+  background-color: var(--card-background-color);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 25px;
   text-align: center;
 }
 
 .result-card.main-result {
-  background: linear-gradient(45deg, #ffe70e, #f0d80d);
-  color: #333;
+  background: var(--main-result-bg);
+  color: var(--main-result-text);
 }
 
 .result-card h3 {
   margin: 0 0 10px 0;
   font-size: 1.2rem;
   text-transform: uppercase;
-  color: #aaa;
+  color: var(--text-secondary-color);
 }
 .result-card.main-result h3,
 .result-card.main-result small {
-  color: #5c5000;
+  color: var(--main-result-secondary-text);
 }
 
 .result-card .calorie-value {
@@ -154,17 +185,17 @@
 .result-card .calorie-value span {
   font-size: 1rem;
   font-weight: normal;
-  color: #aaa;
+  color: var(--text-secondary-color);
 }
 
 .result-card.main-result .calorie-value span {
-  color: #5c5000;
+  color: var(--main-result-secondary-text);
 }
 
 .result-card small {
   margin-top: 5px;
   display: block;
-  color: #888;
+  color: var(--text-secondary-color);
 }
 
 .result-grid {

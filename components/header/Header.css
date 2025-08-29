@@ -21,7 +21,7 @@
 .logo-link {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #ffd900;
+  color: #ffc70e;
   text-decoration: none;
 }
 
@@ -41,7 +41,7 @@
 .user-icon {
   width: 1.25rem;
   height: 1.25rem;
-  color: #ffe600;
+  color: #ffc70e;
 }
 
 .user-name {
@@ -66,7 +66,7 @@
 .theme-icon {
   width: 1.25rem;
   height: 1.25rem;
-  color: #ffe600;
+  color: #ffc70e;
 }
 
 /* Modo oscuro */

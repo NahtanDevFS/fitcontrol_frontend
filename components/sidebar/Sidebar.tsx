@@ -6,7 +6,7 @@ import { Menu, LogOut } from "lucide-react";
 import "./Sidebar.css";
 import { useTheme } from "@/components/ThemeContext";
 import { authService } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Home", href: "/dashboard" },
@@ -22,6 +22,7 @@ export default function Sidebar() {
 
   const { darkMode } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     const result = await authService.logout();
@@ -41,11 +42,18 @@ export default function Sidebar() {
           <span className="logo">FitControl</span>
         </div>
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="nav-link">
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-link ${isActive ? "active" : ""}`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
           <div className="separator" />
           <button onClick={handleLogout} className="logout-button">
             <LogOut className="logout-icon" />
@@ -61,6 +69,7 @@ export default function Sidebar() {
 export function SidebarMobile() {
   const [open, setOpen] = useState(false);
   const { darkMode } = useTheme();
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -87,16 +96,19 @@ export function SidebarMobile() {
             <span className="logo">FitControl</span>
           </div>
           <nav className="sidebar-nav">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="nav-link"
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-link ${isActive ? "active" : ""}`}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
             <div className="separator" />
             <button onClick={handleLogout} className="logout-button">
               <LogOut className="logout-icon" />

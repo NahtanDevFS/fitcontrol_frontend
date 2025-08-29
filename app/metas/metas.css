@@ -1,8 +1,38 @@
 /* app/metas/metas.css */
 
+/*DEFINICIÓN DE COLORES PARA LOS TEMAS*/
+:root {
+  --background-color: #f0f2f5;
+  --card-background-color: #ffffff;
+  --text-primary-color: #1a1a1a;
+  --text-secondary-color: #65676b;
+  --border-color: #e0e0e0;
+  --input-background-color: #f0f2f5;
+  --accent-color: #ffc70e;
+  --accent-color-text: #ffffff;
+  --progress-bar-bg: #e9ecef;
+  --success-color: #28a745;
+  --success-gradient: linear-gradient(45deg, #28a745, #208a38);
+}
+
+html.dark {
+  --background-color: #18191a;
+  --card-background-color: #2a2a2a;
+  --text-primary-color: #f3f3f3;
+  --text-secondary-color: #aaa;
+  --border-color: #444;
+  --input-background-color: #333;
+  --accent-color: #ffe70e;
+  --accent-color-text: #333;
+  --progress-bar-bg: #333;
+  --success-color: #28a745;
+  --success-gradient: linear-gradient(45deg, #28a745, #228b22);
+}
+
 .metas-container {
   padding: 40px;
-  color: #f3f3f3;
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
   max-width: 800px;
   margin: 0 auto;
 }
@@ -13,7 +43,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 20px;
 }
 
@@ -36,11 +66,11 @@
 .form-group input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #555;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   box-sizing: border-box;
-  background-color: #333;
-  color: #f3f3f3;
+  background-color: var(--input-background-color);
+  color: var(--text-primary-color);
   font-size: 1rem;
 }
 
@@ -55,16 +85,16 @@
 }
 
 .btn-primary {
-  background-color: #ffe70e;
-  color: #333;
+  background-color: var(--accent-color);
+  color: var(--accent-color-text);
 }
 .btn-primary:hover:not(:disabled) {
   background-color: #fff491;
 }
 
 .btn-secondary {
-  background-color: #444;
-  color: #f3f3f3;
+  background-color: var(--border-color);
+  color: var(--text-primary-color);
 }
 .btn-secondary:hover:not(:disabled) {
   background-color: #555;
@@ -78,7 +108,7 @@
 .btn-link {
   background: none;
   border: none;
-  color: #aaa;
+  color: var(--text-secondary-color);
   text-decoration: underline;
   cursor: pointer;
   margin-top: 20px;
@@ -86,10 +116,10 @@
 
 /* Estilos específicos del módulo de metas */
 .goal-card {
-  background-color: #2a2a2a;
+  background-color: var(--card-background-color);
   padding: 30px;
   border-radius: 10px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   text-align: center;
 }
 
@@ -99,7 +129,7 @@
 }
 
 .goal-card p {
-  color: #aaa;
+  color: var(--text-secondary-color);
   margin-bottom: 30px;
 }
 
@@ -125,7 +155,7 @@
 
 .progress-details span {
   font-size: 0.9rem;
-  color: #aaa;
+  color: var(--text-secondary-color);
   margin-bottom: 5px;
 }
 
@@ -135,13 +165,13 @@
 }
 
 .progress-details .current-weight strong {
-  color: #ffe70e;
+  color: var(--accent-color);
   font-size: 2rem;
 }
 
 .progress-bar-container {
   width: 100%;
-  background-color: #333;
+  background-color: var(--progress-bar-bg);
   border-radius: 10px;
   height: 30px;
   margin-bottom: 30px;
@@ -149,7 +179,7 @@
 }
 
 .progress-bar {
-  background-color: #28a745; /* Verde */
+  background-color: var(--success-color);
   height: 100%;
   display: flex;
   align-items: center;
@@ -161,12 +191,12 @@
 }
 
 .update-form {
-  border-top: 1px solid #444;
+  border-top: 1px solid var(--border-color);
   padding-top: 30px;
 }
 
 .goal-completed {
-  background: linear-gradient(45deg, #28a745, #228b22);
+  background: var(--success-gradient);
 }
 
 .goal-completed p {

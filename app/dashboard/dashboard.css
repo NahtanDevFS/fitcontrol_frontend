@@ -1,10 +1,40 @@
 /* app/dashboard/dashboard.css */
 
+/* --- 1. DEFINICIÓN DE COLORES PARA LOS TEMAS --- */
+
+/* Por defecto, usamos el tema claro */
+:root {
+  --background-color: #ffffff;
+  --card-background-color: #fffbfb;
+  --text-primary-color: #1a1a1a;
+  --text-secondary-color: #65676b;
+  --border-color: #e0e0e0;
+  --accent-color: #ffc70e; /* Un azul vibrante para el modo claro */
+  --card-hover-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Cuando el html tiene la clase .dark, usamos los colores oscuros */
+html.dark {
+  --background-color: ##202020;
+  --card-background-color: #2a2a2a;
+  --text-primary-color: #f3f3f3;
+  --text-secondary-color: #aaa;
+  --border-color: #444;
+  --accent-color: #ffe70e; /* Tu amarillo característico para el modo oscuro */
+  --card-hover-shadow: rgba(0, 0, 0, 0.4);
+}
+
+/* --- 2. ESTILOS DEL DASHBOARD USANDO VARIABLES --- */
+/* (El resto de los estilos ahora usan var() para tomar los colores del tema) */
+
 .dashboard-container {
   padding: 40px;
-  color: #f3f3f3;
   max-width: 1200px;
   margin: 0 auto;
+  /* El color del contenedor y el texto ahora dependen del tema */
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .dashboard-header {
@@ -16,35 +46,37 @@
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 10px;
+  color: var(--text-primary-color);
+  transition: color 0.3s;
 }
 
 .dashboard-header p {
   font-size: 1.2rem;
-  color: #aaa;
+  color: var(--text-secondary-color);
+  transition: color 0.3s;
 }
 
-/* Cuadrícula de tarjetas */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 25px;
 }
 
-/* Estilo de cada tarjeta */
 .dashboard-card {
-  background-color: #2a2a2a;
-  border: 1px solid #444;
+  background-color: var(--card-background-color);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   text-decoration: none;
-  color: #f3f3f3;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  color: var(--text-primary-color);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+    background-color 0.3s, border-color 0.3s;
 }
 
 .dashboard-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 20px var(--card-hover-shadow);
 }
 
 .card-header {
@@ -52,58 +84,65 @@
   align-items: center;
   gap: 15px;
   padding: 20px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border-color);
+  transition: border-color 0.3s;
 }
 
 .card-icon {
   font-size: 2rem;
-  background-color: #333;
+  background-color: var(--background-color);
   border-radius: 50%;
   width: 50px;
   height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: background-color 0.3s;
 }
 
 .card-title {
   font-size: 1.5rem;
   font-weight: bold;
   margin: 0;
+  color: var(--text-primary-color);
+  transition: color 0.3s;
 }
 
 .card-content {
   padding: 25px;
-  flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible */
+  flex-grow: 1;
 }
 
 .card-metric {
   font-size: 2rem;
   font-weight: bold;
-  color: #ffe70e;
+  color: var(--accent-color);
   margin: 0 0 10px 0;
+  transition: color 0.3s;
 }
 
 .metric-subtitle {
   font-size: 1rem;
   font-weight: normal;
-  color: #aaa;
+  color: var(--text-secondary-color);
+  transition: color 0.3s;
 }
 
 .card-description {
-  color: #ccc;
+  color: var(--text-secondary-color);
   line-height: 1.6;
   font-size: 1rem;
+  transition: color 0.3s;
 }
 
 .card-footer {
   padding: 15px 20px;
-  margin-top: auto; /* Empuja el footer hacia abajo */
+  margin-top: auto;
   text-align: right;
   font-weight: bold;
-  color: #ffe70e;
+  color: var(--accent-color);
   opacity: 0.8;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, color 0.3s;
 }
 
 .dashboard-card:hover .card-footer {
