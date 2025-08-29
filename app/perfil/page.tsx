@@ -10,6 +10,8 @@ import {
   Rutina,
 } from "@/types"; // Asegúrate de tener estos tipos
 import "./perfil.css"; // Crearemos este archivo de estilos
+import { useTheme } from "@/components/ThemeContext";
+import Swal from "sweetalert2";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -34,6 +36,8 @@ export default function PerfilPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -221,6 +225,8 @@ export default function PerfilPage() {
     e.preventDefault();
     if (!userId || !nuevoNombre.trim()) return;
 
+    const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
+
     // Actualizar en la base de datos
     const { data, error } = await supabase
       .from("usuario")
@@ -230,7 +236,12 @@ export default function PerfilPage() {
       .single();
 
     if (error) {
-      alert("Error al actualizar el nombre: " + error.message);
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar el nombre: " + error.message,
+      });
     } else {
       // Actualizar el estado local
       setProfileData((prev) =>
@@ -246,12 +257,21 @@ export default function PerfilPage() {
       }
 
       setIsEditing(false);
-      alert("Nombre actualizado exitosamente.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "success",
+        title: "¡Actualizado!",
+        text: "Tu nombre de usuario ha sido cambiado.",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
   };
 
   const handleUpdateUnidadPeso = async (nuevaUnidad: "kg" | "lbs") => {
     if (!userId || !profileData) return;
+
+    const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
     // Actualización optimista de la UI para una respuesta instantánea
     setProfileData({ ...profileData, unidad_peso: nuevaUnidad });
@@ -262,7 +282,12 @@ export default function PerfilPage() {
       .eq("id_usuario", userId);
 
     if (error) {
-      alert("Error al actualizar tu preferencia. Inténtalo de nuevo.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar tu preferencia. Inténtalo de nuevo.",
+      });
       // Si falla, revertimos el cambio en la UI
       setProfileData({
         ...profileData,

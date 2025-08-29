@@ -204,6 +204,24 @@ html.dark {
   gap: 20px;
 }
 
+.swal-dark {
+  background-color: var(--card-background-color) !important;
+  color: var(--text-primary-color) !important;
+}
+
+.swal-dark .swal2-title {
+  color: var(--text-primary-color) !important;
+}
+
+.swal-dark .swal2-html-container {
+  color: var(--text-secondary-color) !important;
+}
+
+.swal-dark .swal2-confirm,
+.swal-dark .swal2-cancel {
+  border: none !important;
+}
+
 /* NUEVA SECCIÓN RESPONSIVE */
 /* Estilos para pantallas de 400px o menos */
 @media (max-width: 400px) {

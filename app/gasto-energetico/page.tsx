@@ -3,7 +3,9 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import "./gasto-energetico.css"; // Crearemos este archivo de estilos
+import { useTheme } from "@/components/ThemeContext";
+import Swal from "sweetalert2";
+import "./gasto-energetico.css";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -43,6 +45,8 @@ export default function GastoEnergeticoPage() {
   const [showForm, setShowForm] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [unidadPeso, setUnidadPeso] = useState<UnidadPeso>("kg");
+
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const checkUserAndData = async () => {
@@ -114,6 +118,7 @@ export default function GastoEnergeticoPage() {
           initialData={datosGuardados}
           unidadPeso={unidadPeso} // Pasamos la preferencia al formulario
           onSuccess={handleSuccess}
+          darkMode={darkMode}
         />
       ) : (
         <ResultsDisplay data={datosGuardados} unidadPeso={unidadPeso} /> // Pasamos la preferencia a los resultados
@@ -128,11 +133,13 @@ function CalculationForm({
   initialData,
   unidadPeso,
   onSuccess,
+  darkMode,
 }: {
   userId: string;
   initialData: GastoEnergeticoData | null;
   unidadPeso: UnidadPeso;
   onSuccess: (data: GastoEnergeticoData) => void;
+  darkMode: boolean;
 }) {
   const [sexo, setSexo] = useState(initialData?.sexo || "hombre");
   const [edad, setEdad] = useState(initialData?.edad || "");
@@ -152,6 +159,8 @@ function CalculationForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
     const nEdad = Number(edad);
     const nAltura = Number(altura);
@@ -206,9 +215,19 @@ function CalculationForm({
       .single();
 
     if (error) {
-      alert("Error al guardar los datos: " + error.message);
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudieron guardar los datos: " + error.message,
+      });
     } else {
-      alert("¡Cálculo guardado exitosamente!");
+      Swal.fire({
+        ...swalTheme,
+        icon: "success",
+        title: "¡Calculado!",
+        text: "Tus datos han sido guardados exitosamente.",
+      });
       onSuccess(data);
     }
     setLoading(false);

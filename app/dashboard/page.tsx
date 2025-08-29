@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { CumplimientoDietaDia, CumplimientoRutina } from "@/types";
 import "./dashboard.css";
 
 // --- TIPOS ---
@@ -39,34 +40,29 @@ export default function DashboardPage() {
       const userData: UserInfo = JSON.parse(storedUser);
 
       // --- CAMBIO 2: Añadimos una consulta para obtener la preferencia del usuario ---
-      const [progresoData, rutinaData, dietaData, usuarioData] =
+      const [progresoData, rutinaActivaData, dietaActivaData, usuarioData] =
         await Promise.all([
-          // 1. Progreso de peso
           supabase
             .from("progreso_usuario")
             .select("peso_actual, peso_deseado")
             .eq("id_usuario", userData.id)
             .eq("estado", 1)
             .maybeSingle(),
-          // 2. Rutina activa (simplificado para la racha)
           supabase
             .from("rutina")
-            .select(
-              "*, dias:rutina_dia_semana(*, cumplimientos:cumplimiento_rutina(*))"
-            )
+            .select(`*, dias:rutina_dia_semana(*)`)
             .eq("id_usuario", userData.id)
             .eq("estado", 1)
             .limit(1)
             .single(),
-          // 3. Dieta activa (simplificado para la racha)
           supabase
             .from("dieta")
-            .select("*, cumplimientos:cumplimiento_dieta_dia(*)")
+            .select(
+              `*, dias:dieta_alimento(*, alimentos:dieta_alimento_detalle(*))`
+            )
             .eq("id_usuario", userData.id)
-            .eq("estado", 1)
             .limit(1)
             .single(),
-          // 4. Preferencia de unidad del usuario
           supabase
             .from("usuario")
             .select("unidad_peso")
@@ -74,20 +70,98 @@ export default function DashboardPage() {
             .single(),
         ]);
 
-      // (La lógica de cálculo de rachas se queda igual)
+      const diasSemanaMapa: { [key: number]: string } = {
+        0: "Domingo",
+        1: "Lunes",
+        2: "Martes",
+        3: "Miércoles",
+        4: "Jueves",
+        5: "Viernes",
+        6: "Sábado",
+      };
+      const hoy = new Date();
+      const fechaHoyStr = `${hoy.getFullYear()}-${String(
+        hoy.getMonth() + 1
+      ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+
+      // lógica de cálculo de rachas
       let rachaRutina = 0;
-      if (rutinaData.data) {
-        const cumplimientos = rutinaData.data.dias.flatMap(
-          (d: any) => d.cumplimientos
+      if (rutinaActivaData.data) {
+        const diasConRutina = new Set(
+          rutinaActivaData.data.dias.map((d: any) => d.dia_semana)
         );
-        rachaRutina = cumplimientos.filter((c: any) => c.cumplido).length;
+        const idsDiasConRutina = rutinaActivaData.data.dias
+          .map((d: any) => d.id_rutina_dia_semana)
+          .filter(Boolean);
+
+        if (idsDiasConRutina.length > 0) {
+          const { data: cumplimientos } = await supabase
+            .from("cumplimiento_rutina")
+            .select("*")
+            .in("id_rutina_dia_semana", idsDiasConRutina);
+          if (cumplimientos) {
+            const cumplimientosMap = new Map(
+              cumplimientos.map((c: CumplimientoRutina) => [
+                c.fecha_a_cumplir,
+                c.cumplido,
+              ])
+            );
+            for (let i = 1; i < 90; i++) {
+              const diaAnterior = new Date();
+              diaAnterior.setDate(hoy.getDate() - i);
+              const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
+              const fechaStr = `${diaAnterior.getFullYear()}-${String(
+                diaAnterior.getMonth() + 1
+              ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(
+                2,
+                "0"
+              )}`;
+              if (diasConRutina.has(nombreDia)) {
+                if (cumplimientosMap.get(fechaStr) === true) rachaRutina++;
+                else break;
+              }
+            }
+            if (cumplimientosMap.get(fechaHoyStr) === true) rachaRutina++;
+          }
+        }
       }
 
+      // Lógica de racha de dieta COMPLETA
       let rachaDieta = 0;
-      if (dietaData.data) {
-        rachaDieta = dietaData.data.cumplimientos.filter(
-          (c: any) => c.cumplido
-        ).length;
+      if (dietaActivaData.data && dietaActivaData.data.dias) {
+        const diasConDieta = new Set<string>();
+        dietaActivaData.data.dias.forEach((comida: any) => {
+          if (comida.alimentos.length > 0) diasConDieta.add(comida.dia_semana);
+        });
+
+        const { data: cumplimientosDieta } = await supabase
+          .from("cumplimiento_dieta_dia")
+          .select("*")
+          .eq("id_dieta", dietaActivaData.data.id_dieta);
+        if (cumplimientosDieta) {
+          const cumplimientosMap = new Map(
+            cumplimientosDieta.map((c: CumplimientoDietaDia) => [
+              c.fecha_a_cumplir,
+              c.cumplido,
+            ])
+          );
+          for (let i = 1; i < 90; i++) {
+            const diaAnterior = new Date();
+            diaAnterior.setDate(hoy.getDate() - i);
+            const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
+            const fechaStr = `${diaAnterior.getFullYear()}-${String(
+              diaAnterior.getMonth() + 1
+            ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(
+              2,
+              "0"
+            )}`;
+            if (diasConDieta.has(nombreDia)) {
+              if (cumplimientosMap.get(fechaStr) === true) rachaDieta++;
+              else break;
+            }
+          }
+          if (cumplimientosMap.get(fechaHoyStr) === true) rachaDieta++;
+        }
       }
 
       setData({
@@ -96,7 +170,7 @@ export default function DashboardPage() {
         rachaDieta: rachaDieta,
         pesoActual: progresoData.data?.peso_actual || null,
         metaPeso: progresoData.data?.peso_deseado || null,
-        unidadPeso: usuarioData.data?.unidad_peso || "kg", // <-- Guardamos la preferencia
+        unidadPeso: usuarioData.data?.unidad_peso || "kg", // Guardamos la preferencia
       });
 
       setLoading(false);
@@ -132,7 +206,7 @@ export default function DashboardPage() {
       </header>
 
       <div className="dashboard-grid">
-        <DashboardCard title="Mi Rutina" icon="🏋️" link="/rutinas">
+        <DashboardCard title="Mi Rutina" icon="🏋️" link="/rutina">
           <p className="card-metric">🔥 {data?.rachaRutina} Días de Racha</p>
           <p className="card-description">
             ¡No la rompas! Revisa tu entrenamiento de hoy y marca tus ejercicios

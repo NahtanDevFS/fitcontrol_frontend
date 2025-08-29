@@ -494,6 +494,25 @@ html.dark {
   margin-top: 20px;
 }
 
+.swal-dark {
+  background-color: var(--card-background-color) !important;
+  color: var(--text-primary-color) !important;
+}
+
+.swal-dark .swal2-title {
+  color: var(--text-primary-color) !important;
+}
+
+.swal-dark .swal2-html-container,
+.swal-dark .swal2-content {
+  color: var(--text-secondary-color) !important;
+}
+
+.swal-dark .swal2-confirm,
+.swal-dark .swal2-cancel {
+  border: none !important;
+}
+
 /* === MEDIA QUERIES PARA RESPONSIVE === */
 @media (min-width: 768px) {
   .streak-container {

@@ -9,6 +9,8 @@ import {
   AlimentoDetalle,
   CumplimientoDietaDia,
 } from "@/types";
+import Swal from "sweetalert2";
+import { useTheme } from "@/components/ThemeContext";
 import "./dieta.css";
 
 // --- TIPOS ---
@@ -44,6 +46,8 @@ export default function DietaPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
+
+  const { darkMode } = useTheme();
 
   const fetchDieta = useCallback(async (currentUserId: string) => {
     setLoading(true);
@@ -122,15 +126,40 @@ export default function DietaPage() {
   };
 
   const handleDeleteFood = async (alimentoId: number) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este alimento?")) {
+    const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
+    const result = await Swal.fire({
+      ...swalTheme,
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffe70e",
+      cancelButtonColor: "#65676b",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+    if (result.isConfirmed) {
       const { error } = await supabase
         .from("dieta_alimento_detalle")
         .delete()
         .eq("id_dieta_alimento_detalle", alimentoId);
 
       if (error) {
-        alert("Error al eliminar el alimento: " + error.message);
+        Swal.fire({
+          ...swalTheme,
+          icon: "error",
+          title: "Error",
+          text: "No se pudo eliminar el alimento: " + error.message,
+        });
       } else {
+        Swal.fire({
+          ...swalTheme,
+          icon: "success",
+          title: "Eliminado",
+          text: "El alimento ha sido eliminado.",
+          showConfirmButton: false,
+          timer: 1500,
+        });
         fetchDieta(userId!);
       }
     }
@@ -155,6 +184,7 @@ export default function DietaPage() {
         key={`daily-${dieta.id_dieta}`}
         dieta={dieta}
         userId={userId!}
+        darkMode={darkMode}
       />
       <DietStreakTracker
         key={`streak-${dieta.id_dieta}`}
@@ -225,13 +255,22 @@ export default function DietaPage() {
             setIsModalOpen(false);
             fetchDieta(userId!);
           }}
+          darkMode={darkMode}
         />
       )}
     </div>
   );
 }
 
-function DailyDietTracker({ dieta, userId }: { dieta: Dieta; userId: string }) {
+function DailyDietTracker({
+  dieta,
+  userId,
+  darkMode,
+}: {
+  dieta: Dieta;
+  userId: string;
+  darkMode: boolean;
+}) {
   const [comidasDeHoy, setComidasDeHoy] = useState<MealStatus[]>([]);
   const [diaCumplido, setDiaCumplido] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -344,13 +383,21 @@ function DailyDietTracker({ dieta, userId }: { dieta: Dieta; userId: string }) {
   };
 
   const handleMarkDayComplete = async () => {
+    const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
     await supabase
       .from("cumplimiento_dieta_dia")
       .update({ cumplido: true })
       .eq("id_usuario", userId)
       .eq("fecha_a_cumplir", fechaLocalISO);
     setDiaCumplido(true);
-    alert("¡Felicidades por completar tu dieta de hoy!");
+    Swal.fire({
+      ...swalTheme,
+      icon: "success",
+      title: "¡Felicidades!",
+      text: "Has completado tu dieta de hoy.",
+      showConfirmButton: false,
+      timer: 2000,
+    });
   };
 
   if (loading)
@@ -598,6 +645,7 @@ interface AddFoodModalProps {
   foodToEdit?: AlimentoDetalle;
   onClose: () => void;
   onFoodAdded: () => void;
+  darkMode: boolean;
 }
 
 // --- SUB-COMPONENTE MODAL PARA AÑADIR ALIMENTOS (CON BÚSQUEDA PRIORIZADA) ---
@@ -608,6 +656,7 @@ function AddFoodModal({
   foodToEdit,
   onClose,
   onFoodAdded,
+  darkMode,
 }: AddFoodModalProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -641,6 +690,8 @@ function AddFoodModal({
     }
   }, [foodToEdit]);
 
+  const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query) return;
@@ -663,7 +714,12 @@ function AddFoodModal({
       }
       setResults(data.foods || []);
     } catch (error) {
-      alert("Error al buscar alimentos.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error de Búsqueda",
+        text: "No se pudieron obtener los alimentos.",
+      });
     }
     setLoading(false);
   };
@@ -693,7 +749,12 @@ function AddFoodModal({
       };
       setNutrition(nutrients);
     } catch (error) {
-      alert("Error al obtener datos nutricionales.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error de Nutrición",
+        text: "No se pudieron obtener los datos nutricionales.",
+      });
     }
     setLoading(false);
   };
@@ -701,7 +762,12 @@ function AddFoodModal({
   const handleSaveFood = async () => {
     if (!nutrition || !selectedFood?.description) {
       // <-- Verificación de seguridad
-      alert("No hay datos de alimento para guardar.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "warning",
+        title: "Faltan Datos",
+        text: "No hay información nutricional para guardar.",
+      });
       return;
     }
     setLoading(true);
@@ -752,10 +818,24 @@ function AddFoodModal({
           .from("dieta_alimento_detalle")
           .insert({ ...foodData, id_dieta_alimento: mealId });
       }
-      alert(`Alimento ${foodToEdit ? "actualizado" : "añadido"} exitosamente.`);
+      Swal.fire({
+        ...swalTheme,
+        icon: "success",
+        title: "¡Guardado!",
+        text: `Alimento ${
+          foodToEdit ? "actualizado" : "añadido"
+        } exitosamente.`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
       onFoodAdded();
     } catch (error: any) {
-      alert("Error al guardar el alimento: " + error.message);
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error al Guardar",
+        text: error.message,
+      });
     }
     setLoading(false);
   };

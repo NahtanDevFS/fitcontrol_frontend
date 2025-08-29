@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import Swal from "sweetalert2";
+import { useTheme } from "@/components/ThemeContext";
 import "./metas.css";
 
 // --- TIPOS ---
@@ -30,6 +32,8 @@ export default function MetasPage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [unidadPeso, setUnidadPeso] = useState<UnidadPeso>("kg"); // Estado para la preferencia
+
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userFitControl");
@@ -99,12 +103,14 @@ export default function MetasPage() {
           progreso={progresoActivo}
           unidadPeso={unidadPeso}
           onMetaCambiada={() => fetchProgresoActivo(userId)}
+          darkMode={darkMode}
         />
       ) : (
         <CreateGoalForm
           userId={userId}
           unidadPeso={unidadPeso}
           onMetaCreada={() => fetchProgresoActivo(userId)}
+          darkMode={darkMode}
         />
       )}
     </div>
@@ -116,10 +122,12 @@ function CreateGoalForm({
   userId,
   unidadPeso,
   onMetaCreada,
+  darkMode,
 }: {
   userId: string;
   unidadPeso: UnidadPeso;
   onMetaCreada: () => void;
+  darkMode: boolean;
 }) {
   const [pesoActual, setPesoActual] = useState("");
   const [pesoDeseado, setPesoDeseado] = useState("");
@@ -132,8 +140,28 @@ function CreateGoalForm({
     let pa = parseFloat(pesoActual);
     let pd = parseFloat(pesoDeseado);
 
+    const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
+
     if (isNaN(pa) || isNaN(pd) || pa <= 0 || pd <= 0) {
-      alert("Por favor, ingresa valores de peso válidos.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Datos incorrectos",
+        text: "Por favor, ingresa valores de peso válidos y mayores a cero.",
+        confirmButtonColor: "#ffe70e",
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (pa === pd) {
+      Swal.fire({
+        ...swalTheme,
+        icon: "warning",
+        title: "Meta no válida",
+        text: "Tu peso actual y tu peso objetivo no pueden ser iguales.",
+        confirmButtonColor: "#ffe70e",
+      });
       setLoading(false);
       return;
     }
@@ -157,9 +185,21 @@ function CreateGoalForm({
     });
 
     if (error) {
-      alert("Error al crear la meta: " + error.message);
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Oops...",
+        text: "Error al crear la meta: " + error.message,
+        confirmButtonColor: "#ffe70e",
+      });
     } else {
-      alert("¡Meta creada exitosamente! ¡A por ello!");
+      Swal.fire({
+        ...swalTheme,
+        icon: "success",
+        title: "¡Meta creada!",
+        text: "Tu nuevo objetivo ha sido guardado. ¡A por ello!",
+        confirmButtonColor: "#ffe70e",
+      });
       onMetaCreada();
     }
     setLoading(false);
@@ -208,10 +248,12 @@ function ProgressTracker({
   progreso,
   unidadPeso,
   onMetaCambiada,
+  darkMode,
 }: {
   progreso: Progreso;
   unidadPeso: UnidadPeso;
   onMetaCambiada: () => void;
+  darkMode: boolean;
 }) {
   // Convertimos el peso de la BD a la unidad preferida para mostrarlo
   const pesoActualKg = progreso.peso_actual;
@@ -246,13 +288,20 @@ function ProgressTracker({
     (objetivo === "bajar" && peso_actual <= peso_deseado) ||
     (objetivo === "subir" && peso_actual >= peso_deseado);
 
+  const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
+
   const handleUpdatePeso = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     let pa = parseFloat(nuevoPeso);
 
     if (isNaN(pa) || pa <= 0) {
-      alert("Ingresa un peso válido.");
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "Ingresa un peso válido.",
+      });
       setLoading(false);
       return;
     }
@@ -268,16 +317,57 @@ function ProgressTracker({
       .eq("id_progreso", progreso.id_progreso);
 
     if (error) {
-      alert("Error al actualizar el peso: " + error.message);
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar el peso: " + error.message,
+      });
     } else {
-      alert("¡Peso actualizado!");
+      Swal.fire({
+        ...swalTheme,
+        icon: "success",
+        title: "¡Peso actualizado!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
       onMetaCambiada();
     }
     setLoading(false);
   };
 
   const handleNuevoObjetivo = async () => {
-    // ... (esta función se queda igual)
+    // Reemplazamos confirm con Swal
+    const result = await Swal.fire({
+      ...swalTheme,
+      title: "¿Estás seguro?",
+      text: "¿Quieres finalizar esta meta y empezar una nueva?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffe70e",
+      cancelButtonColor: "#65676b",
+      confirmButtonText: "Sí, empezar una nueva",
+      cancelButtonText: "No, cancelar",
+    });
+
+    if (result.isConfirmed) {
+      setLoading(true);
+      const { error } = await supabase
+        .from("progreso_usuario")
+        .update({ estado: 2, fecha_final_proceso: new Date().toISOString() })
+        .eq("id_progreso", progreso.id_progreso);
+      if (error) {
+        Swal.fire({
+          ...swalTheme,
+          icon: "error",
+          title: "Error",
+          text: "No se pudo finalizar la meta: " + error.message,
+        });
+      } else {
+        onMetaCambiada();
+      }
+      setLoading(false);
+    }
   };
 
   if (metaAlcanzada) {
