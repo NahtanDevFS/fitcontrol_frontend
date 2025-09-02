@@ -6,6 +6,7 @@ import "./LayoutWrapper.css";
 import { ThemeProvider } from "../ThemeContext";
 import Header from "../header/Header";
 import Footer from "../footer/Footer";
+import Chatbot from "../chatbot/Chatbot";
 
 // Rutas públicas donde NO debe aparecer el sidebar
 const publicRoutes = [
@@ -26,11 +27,11 @@ export default function LayoutWrapper({
   const isPublicRoute = publicRoutes.includes(pathname);
 
   if (isPublicRoute) {
-    // Para rutas públicas (login, register, etc.) - sin sidebar
+    // Para rutas públicas (login, register, etc.) sin sidebar
     return <main>{children}</main>;
   }
 
-  // Para rutas protegidas (dashboard, dieta, etc.) - con sidebar
+  // Para rutas protegidas (dashboard, dieta, etc.) con sidebar
   return (
     <div className="layout-container">
       <ThemeProvider>
@@ -43,6 +44,7 @@ export default function LayoutWrapper({
           <main className="main-content">{children}</main>
           <Footer />
         </div>
+        <Chatbot />
       </ThemeProvider>
     </div>
   );
