@@ -194,54 +194,62 @@ export default function DietaPage() {
 
       <h2 className="section-title">Editor de Plan Semanal</h2>
       <div className="dieta-grid">
-        {DIAS_SEMANA.map((dia) => (
-          <div key={dia} className="day-column">
-            <h3>{dia}</h3>
-            {TIEMPOS_COMIDA.map((tiempo) => (
-              <div key={tiempo} className="meal-slot">
-                <h4>{tiempo}</h4>
-                <ul>
-                  {dieta.dias[dia]?.[tiempo]?.alimentos.map((alimento) => (
-                    <li key={alimento.id_dieta_alimento_detalle}>
-                      <span className="food-item-name">
-                        {alimento.nombre_alimento}
-                      </span>
-                      <div className="food-item-actions">
-                        <span>
-                          {alimento.calorias_alimento.toFixed(0)} kcal
-                        </span>
-                        <button
-                          onClick={() =>
-                            openEditFoodModal(dia, tiempo, alimento)
-                          }
-                          className="btn-icon"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleDeleteFood(
-                              alimento.id_dieta_alimento_detalle!
-                            )
-                          }
-                          className="btn-icon btn-delete"
-                        >
-                          ❌
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className="btn-add-food"
-                  onClick={() => openAddFoodModal(dia, tiempo)}
-                >
-                  +
-                </button>
+        {DIAS_SEMANA.map((dia) => {
+          const totalCaloriasDia = Object.values(dieta.dias[dia] || {})
+            .flatMap((meal) => meal.alimentos)
+            .reduce((total, alimento) => total + alimento.calorias_alimento, 0);
+          return (
+            <div key={dia} className="day-column">
+              <h3>{dia}</h3>
+              <div className="day-total-calories">
+                🔥 {totalCaloriasDia.toFixed(0)} kcal totales
               </div>
-            ))}
-          </div>
-        ))}
+              {TIEMPOS_COMIDA.map((tiempo) => (
+                <div key={tiempo} className="meal-slot">
+                  <h4>{tiempo}</h4>
+                  <ul>
+                    {dieta.dias[dia]?.[tiempo]?.alimentos.map((alimento) => (
+                      <li key={alimento.id_dieta_alimento_detalle}>
+                        <span className="food-item-name">
+                          {alimento.nombre_alimento}
+                        </span>
+                        <div className="food-item-actions">
+                          <span>
+                            {alimento.calorias_alimento.toFixed(0)} kcal
+                          </span>
+                          <button
+                            onClick={() =>
+                              openEditFoodModal(dia, tiempo, alimento)
+                            }
+                            className="btn-icon"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDeleteFood(
+                                alimento.id_dieta_alimento_detalle!
+                              )
+                            }
+                            className="btn-icon btn-delete"
+                          >
+                            ❌
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    className="btn-add-food"
+                    onClick={() => openAddFoodModal(dia, tiempo)}
+                  >
+                    +
+                  </button>
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </div>
 
       {isModalOpen && modalData && (

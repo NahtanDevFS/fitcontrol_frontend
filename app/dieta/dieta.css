@@ -513,6 +513,34 @@ html.dark {
   border: none !important;
 }
 
+day-column-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  transition: border-color 0.3s;
+}
+
+.day-column-header h3 {
+  color: var(--accent-color);
+  margin: 0;
+  font-size: 1.5rem; /* Ajustamos el tamaño para que encaje mejor */
+}
+
+.day-total-calories {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-primary-color);
+  margin-top: 5px;
+  transition: color 0.3s;
+}
+
+/* Modificación para quitar el borde del h3 original */
+.day-column > h3 {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
 /* === MEDIA QUERIES PARA RESPONSIVE === */
 @media (min-width: 768px) {
   .streak-container {
