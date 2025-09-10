@@ -4,8 +4,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { CumplimientoDietaDia, CumplimientoRutina } from "@/types";
+import {
+  CumplimientoDietaDia,
+  CumplimientoRutina,
+  DashboardData,
+} from "@/types";
 import "./dashboard.css";
+import { dashboardService } from "@/services/DashboardService";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -14,14 +19,14 @@ interface UserInfo {
 }
 
 // --- CAMBIO 1: Añadimos la unidad de peso a los datos del dashboard ---
-interface DashboardData {
-  nombreUsuario: string;
-  rachaRutina: number;
-  rachaDieta: number;
-  pesoActual: number | null;
-  metaPeso: number | null;
-  unidadPeso: "kg" | "lbs"; // <-- NUEVO CAMPO
-}
+// interface DashboardData {
+//   nombreUsuario: string;
+//   rachaRutina: number;
+//   rachaDieta: number;
+//   pesoActual: number | null;
+//   metaPeso: number | null;
+//   unidadPeso: "kg" | "lbs"; // <-- NUEVO CAMPO
+// }
 
 const KG_TO_LBS = 2.20462;
 
@@ -39,140 +44,17 @@ export default function DashboardPage() {
       }
       const userData: UserInfo = JSON.parse(storedUser);
 
-      // --- CAMBIO 2: Añadimos una consulta para obtener la preferencia del usuario ---
-      const [progresoData, rutinaActivaData, dietaActivaData, usuarioData] =
-        await Promise.all([
-          supabase
-            .from("progreso_usuario")
-            .select("peso_actual, peso_deseado")
-            .eq("id_usuario", userData.id)
-            .eq("estado", 1)
-            .maybeSingle(),
-          supabase
-            .from("rutina")
-            .select(`*, dias:rutina_dia_semana(*)`)
-            .eq("id_usuario", userData.id)
-            .eq("estado", 1)
-            .limit(1)
-            .single(),
-          supabase
-            .from("dieta")
-            .select(
-              `*, dias:dieta_alimento(*, alimentos:dieta_alimento_detalle(*))`
-            )
-            .eq("id_usuario", userData.id)
-            .limit(1)
-            .single(),
-          supabase
-            .from("usuario")
-            .select("unidad_peso")
-            .eq("id_usuario", userData.id)
-            .single(),
-        ]);
+      // --- ÚNICA LLAMADA A LA API ---
+      const response = await dashboardService.getDashboardData(userData.id);
 
-      const diasSemanaMapa: { [key: number]: string } = {
-        0: "Domingo",
-        1: "Lunes",
-        2: "Martes",
-        3: "Miércoles",
-        4: "Jueves",
-        5: "Viernes",
-        6: "Sábado",
-      };
-      const hoy = new Date();
-      const fechaHoyStr = `${hoy.getFullYear()}-${String(
-        hoy.getMonth() + 1
-      ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-
-      // lógica de cálculo de rachas
-      let rachaRutina = 0;
-      if (rutinaActivaData.data) {
-        const diasConRutina = new Set(
-          rutinaActivaData.data.dias.map((d: any) => d.dia_semana)
+      if (response.success && response.data) {
+        setData(response.data);
+      } else {
+        console.error(
+          "Error al cargar los datos del dashboard:",
+          response.error
         );
-        const idsDiasConRutina = rutinaActivaData.data.dias
-          .map((d: any) => d.id_rutina_dia_semana)
-          .filter(Boolean);
-
-        if (idsDiasConRutina.length > 0) {
-          const { data: cumplimientos } = await supabase
-            .from("cumplimiento_rutina")
-            .select("*")
-            .in("id_rutina_dia_semana", idsDiasConRutina);
-          if (cumplimientos) {
-            const cumplimientosMap = new Map(
-              cumplimientos.map((c: CumplimientoRutina) => [
-                c.fecha_a_cumplir,
-                c.cumplido,
-              ])
-            );
-            for (let i = 1; i < 90; i++) {
-              const diaAnterior = new Date();
-              diaAnterior.setDate(hoy.getDate() - i);
-              const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-              const fechaStr = `${diaAnterior.getFullYear()}-${String(
-                diaAnterior.getMonth() + 1
-              ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(
-                2,
-                "0"
-              )}`;
-              if (diasConRutina.has(nombreDia)) {
-                if (cumplimientosMap.get(fechaStr) === true) rachaRutina++;
-                else break;
-              }
-            }
-            if (cumplimientosMap.get(fechaHoyStr) === true) rachaRutina++;
-          }
-        }
       }
-
-      // Lógica de racha de dieta COMPLETA
-      let rachaDieta = 0;
-      if (dietaActivaData.data && dietaActivaData.data.dias) {
-        const diasConDieta = new Set<string>();
-        dietaActivaData.data.dias.forEach((comida: any) => {
-          if (comida.alimentos.length > 0) diasConDieta.add(comida.dia_semana);
-        });
-
-        const { data: cumplimientosDieta } = await supabase
-          .from("cumplimiento_dieta_dia")
-          .select("*")
-          .eq("id_dieta", dietaActivaData.data.id_dieta);
-        if (cumplimientosDieta) {
-          const cumplimientosMap = new Map(
-            cumplimientosDieta.map((c: CumplimientoDietaDia) => [
-              c.fecha_a_cumplir,
-              c.cumplido,
-            ])
-          );
-          for (let i = 1; i < 90; i++) {
-            const diaAnterior = new Date();
-            diaAnterior.setDate(hoy.getDate() - i);
-            const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-            const fechaStr = `${diaAnterior.getFullYear()}-${String(
-              diaAnterior.getMonth() + 1
-            ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(
-              2,
-              "0"
-            )}`;
-            if (diasConDieta.has(nombreDia)) {
-              if (cumplimientosMap.get(fechaStr) === true) rachaDieta++;
-              else break;
-            }
-          }
-          if (cumplimientosMap.get(fechaHoyStr) === true) rachaDieta++;
-        }
-      }
-
-      setData({
-        nombreUsuario: userData.nombre,
-        rachaRutina: rachaRutina,
-        rachaDieta: rachaDieta,
-        pesoActual: progresoData.data?.peso_actual || null,
-        metaPeso: progresoData.data?.peso_deseado || null,
-        unidadPeso: usuarioData.data?.unidad_peso || "kg", // Guardamos la preferencia
-      });
-
       setLoading(false);
     };
 

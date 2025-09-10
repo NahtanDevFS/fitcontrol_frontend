@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+//import { supabase } from "@/lib/supabase";
 import {
   CumplimientoDietaDia,
   CumplimientoRutina,
@@ -12,6 +12,8 @@ import {
 import "./perfil.css"; // Crearemos este archivo de estilos
 import { useTheme } from "@/components/ThemeContext";
 import Swal from "sweetalert2";
+import { ProfileData } from "@/types";
+import { profileService } from "@/services/ProfileService";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -20,14 +22,14 @@ interface UserInfo {
   email: string;
 }
 
-interface ProfileData {
-  nombre_usuario: string;
-  correo_usuario: string;
-  peso_actual: number | null;
-  racha_rutina: number;
-  racha_dieta: number;
-  unidad_peso: "kg" | "lbs";
-}
+// interface ProfileData {
+//   nombre_usuario: string;
+//   correo_usuario: string;
+//   peso_actual: number | null;
+//   racha_rutina: number;
+//   racha_dieta: number;
+//   unidad_peso: "kg" | "lbs";
+// }
 
 // --- COMPONENTE PRINCIPAL ---
 export default function PerfilPage() {
@@ -40,8 +42,7 @@ export default function PerfilPage() {
   const { darkMode } = useTheme();
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      // 1. Obtener ID de usuario desde localStorage
+    const fetchInitialData = async () => {
       const storedUser = localStorage.getItem("userFitControl");
       if (!storedUser) {
         window.location.href = "/login";
@@ -49,210 +50,46 @@ export default function PerfilPage() {
       }
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
-      setNuevoNombre(userData.nombre);
 
-      // --- Promesas para obtener todos los datos en paralelo ---
-      const userProfilePromise = supabase
-        .from("usuario")
-        .select("nombre_usuario, correo_usuario, unidad_peso")
-        .eq("id_usuario", userData.id)
-        .single();
-
-      const pesoPromise = supabase
-        .from("progreso_usuario")
-        .select("peso_actual")
-        .eq("id_usuario", userData.id)
-        .eq("estado", 1)
-        .single();
-
-      // Para la racha, necesitamos la rutina activa y sus cumplimientos
-      const rutinaActivaPromise = supabase
-        .from("rutina")
-        .select(`*, dias:rutina_dia_semana(*)`)
-        .eq("id_usuario", userData.id)
-        .eq("estado", 1)
-        .limit(1)
-        .single();
-
-      //promesa para obtener la dieta activa
-      const dietaActivaPromise = supabase
-        .from("dieta")
-        .select(
-          `*, dias:dieta_alimento(*, alimentos:dieta_alimento_detalle(*))`
-        )
-        .eq("id_usuario", userData.id)
-        .limit(1)
-        .single();
-
-      // --- Ejecutar todas las consultas ---
-      const [
-        { data: userProfile },
-        { data: pesoData },
-        { data: rutinaActivaData },
-        { data: dietaActivaData },
-      ] = await Promise.all([
-        userProfilePromise,
-        pesoPromise,
-        rutinaActivaPromise,
-        dietaActivaPromise,
-      ]);
-
-      // --- Calcular la racha ---
-      let rachaRutina = 0;
-      if (rutinaActivaData) {
-        const diasConRutina = new Set(
-          rutinaActivaData.dias.map((d: any) => d.dia_semana)
-        );
-        const idsDiasConRutina = rutinaActivaData.dias
-          .map((d: any) => d.id_rutina_dia_semana)
-          .filter(Boolean);
-
-        const { data: cumplimientos } = await supabase
-          .from("cumplimiento_rutina")
-          .select("*")
-          .in("id_rutina_dia_semana", idsDiasConRutina);
-
-        if (cumplimientos) {
-          const cumplimientosMap = new Map(
-            cumplimientos.map((c: CumplimientoRutina) => [
-              c.fecha_a_cumplir,
-              c.cumplido,
-            ])
-          );
-          const diasSemanaMapa: { [key: number]: string } = {
-            0: "Domingo",
-            1: "Lunes",
-            2: "Martes",
-            3: "Miércoles",
-            4: "Jueves",
-            5: "Viernes",
-            6: "Sábado",
-          };
-          const hoy = new Date();
-          const fechaHoyStr = `${hoy.getFullYear()}-${String(
-            hoy.getMonth() + 1
-          ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-
-          for (let i = 1; i < 90; i++) {
-            const diaAnterior = new Date();
-            diaAnterior.setDate(hoy.getDate() - i);
-            const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-            const fechaStr = `${diaAnterior.getFullYear()}-${String(
-              diaAnterior.getMonth() + 1
-            ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(
-              2,
-              "0"
-            )}`;
-
-            if (diasConRutina.has(nombreDia)) {
-              if (cumplimientosMap.get(fechaStr) === true) rachaRutina++;
-              else break;
-            }
-          }
-          if (cumplimientosMap.get(fechaHoyStr) === true) rachaRutina++;
-        }
+      // --- 3. ÚNICA LLAMADA A LA API ---
+      const response = await profileService.getProfileData(userData.id);
+      if (response.success && response.data) {
+        setProfileData(response.data);
+        setNuevoNombre(response.data.nombre_usuario);
+      } else {
+        console.error("Error al cargar los datos del perfil:", response.error);
       }
-
-      let rachaDieta = 0;
-      if (dietaActivaData) {
-        const diasConDieta = new Set<string>();
-        dietaActivaData.dias.forEach((comida: any) => {
-          if (comida.alimentos.length > 0) diasConDieta.add(comida.dia_semana);
-        });
-
-        const { data: cumplimientosDieta } = await supabase
-          .from("cumplimiento_dieta_dia")
-          .select("*")
-          .eq("id_dieta", dietaActivaData.id_dieta);
-
-        if (cumplimientosDieta) {
-          const cumplimientosMap = new Map(
-            cumplimientosDieta.map((c: CumplimientoDietaDia) => [
-              c.fecha_a_cumplir,
-              c.cumplido,
-            ])
-          );
-          const diasSemanaMapa: { [key: number]: string } = {
-            0: "Domingo",
-            1: "Lunes",
-            2: "Martes",
-            3: "Miércoles",
-            4: "Jueves",
-            5: "Viernes",
-            6: "Sábado",
-          };
-          const hoy = new Date();
-          const fechaHoyStr = `${hoy.getFullYear()}-${String(
-            hoy.getMonth() + 1
-          ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-
-          for (let i = 1; i < 90; i++) {
-            const diaAnterior = new Date();
-            diaAnterior.setDate(hoy.getDate() - i);
-            const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-            const fechaStr = `${diaAnterior.getFullYear()}-${String(
-              diaAnterior.getMonth() + 1
-            ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(
-              2,
-              "0"
-            )}`;
-
-            if (diasConDieta.has(nombreDia)) {
-              if (cumplimientosMap.get(fechaStr) === true) rachaDieta++;
-              else break;
-            }
-          }
-          if (cumplimientosMap.get(fechaHoyStr) === true) rachaDieta++;
-        }
-      }
-
-      setProfileData({
-        nombre_usuario: userProfile?.nombre_usuario || userData.nombre,
-        correo_usuario: userProfile?.correo_usuario || userData.email,
-        peso_actual: pesoData?.peso_actual || null,
-        racha_rutina: rachaRutina,
-        racha_dieta: rachaDieta,
-        unidad_peso: userProfile?.unidad_peso || "kg",
-      });
-
       setLoading(false);
     };
-
-    fetchProfileData();
+    fetchInitialData();
   }, []);
 
   const handleUpdateNombre = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId || !nuevoNombre.trim()) return;
+    if (!userId || !nuevoNombre.trim() || !profileData) return;
 
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
-    // Actualizar en la base de datos
-    const { data, error } = await supabase
-      .from("usuario")
-      .update({ nombre_usuario: nuevoNombre.trim() })
-      .eq("id_usuario", userId)
-      .select()
-      .single();
+    // Llamada a la API a través del servicio
+    const response = await profileService.updateUser(userId, {
+      nombre_usuario: nuevoNombre.trim(),
+    });
 
-    if (error) {
-      Swal.fire({
-        ...swalTheme,
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el nombre: " + error.message,
-      });
-    } else {
-      // Actualizar el estado local
+    if (response.success && response.data) {
+      // Ahora TypeScript sabe que response.data es de tipo Usuario
+      const updatedUser = response.data;
+
+      // Actualizar el estado local con la respuesta de la API
       setProfileData((prev) =>
-        prev ? { ...prev, nombre_usuario: data.nombre_usuario } : null
+        prev ? { ...prev, nombre_usuario: updatedUser.nombre_usuario } : null
       );
 
       // Actualizar localStorage para mantener la consistencia en la app
       const storedUser = localStorage.getItem("userFitControl");
       if (storedUser) {
         const userData: UserInfo = JSON.parse(storedUser);
-        userData.nombre = data.nombre_usuario;
+        // Actualizamos el nombre en el objeto antes de guardarlo de nuevo
+        userData.nombre = updatedUser.nombre_usuario;
         localStorage.setItem("userFitControl", JSON.stringify(userData));
       }
 
@@ -265,6 +102,13 @@ export default function PerfilPage() {
         showConfirmButton: false,
         timer: 1500,
       });
+    } else {
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar el nombre: " + response.error,
+      });
     }
   };
 
@@ -276,12 +120,11 @@ export default function PerfilPage() {
     // Actualización optimista de la UI para una respuesta instantánea
     setProfileData({ ...profileData, unidad_peso: nuevaUnidad });
 
-    const { error } = await supabase
-      .from("usuario")
-      .update({ unidad_peso: nuevaUnidad })
-      .eq("id_usuario", userId);
+    const response = await profileService.updateUser(userId, {
+      unidad_peso: nuevaUnidad,
+    });
 
-    if (error) {
+    if (!response.success) {
       Swal.fire({
         ...swalTheme,
         icon: "error",

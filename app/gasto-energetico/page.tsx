@@ -2,27 +2,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+//import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/components/ThemeContext";
 import Swal from "sweetalert2";
 import "./gasto-energetico.css";
+import { GastoEnergeticoData } from "@/types";
+import { energyExpenditureService } from "@/services/EnergyExpenditureService";
 
 // --- TIPOS ---
 interface UserInfo {
   id: string;
-}
-interface GastoEnergeticoData {
-  id_usuario: string;
-  sexo: "hombre" | "mujer";
-  edad: number;
-  altura_cm: number;
-  peso_kg: number;
-  nivel_actividad: number;
-  tmb: number;
-  calorias_mantener: number;
-  calorias_deficit: number;
-  calorias_superavit: number;
-  peso_ideal_kg: number;
 }
 
 type UnidadPeso = "kg" | "lbs";
@@ -58,24 +47,13 @@ export default function GastoEnergeticoPage() {
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
 
-      const { data: gastoData } = await supabase
-        .from("gasto_energetico")
-        .select("*")
-        .eq("id_usuario", userData.id)
-        .maybeSingle();
-      const { data: usuarioData } = await supabase
-        .from("usuario")
-        .select("unidad_peso")
-        .eq("id_usuario", userData.id)
-        .single();
+      // --- LLAMADA A LA API PARA OBTENER DATOS ---
+      const response = await energyExpenditureService.getGastoEnergetico(
+        userData.id
+      );
 
-      // Guardamos la preferencia del usuario en el estado del componente.
-      if (usuarioData?.unidad_peso) {
-        setUnidadPeso(usuarioData.unidad_peso as UnidadPeso);
-      }
-
-      if (gastoData) {
-        setDatosGuardados(gastoData);
+      if (response.success && response.data) {
+        setDatosGuardados(response.data);
         setShowForm(false);
       } else {
         setShowForm(true);
@@ -208,27 +186,35 @@ function CalculationForm({
       peso_ideal_kg,
     };
 
-    const { data, error } = await supabase
-      .from("gasto_energetico")
-      .upsert(dataToUpsert, { onConflict: "id_usuario" })
-      .select()
-      .single();
+    const payload = {
+      id_usuario: userId,
+      sexo: sexo as "hombre" | "mujer",
+      edad: Number(edad),
+      altura_cm: Number(altura),
+      peso_kg: nPesoKg,
+      nivel_actividad: Number(actividad),
+    };
 
-    if (error) {
-      Swal.fire({
-        ...swalTheme,
-        icon: "error",
-        title: "Error",
-        text: "No se pudieron guardar los datos: " + error.message,
-      });
-    } else {
+    // --- LLAMADA A LA API PARA CALCULAR Y GUARDAR ---
+    const response = await energyExpenditureService.upsertGastoEnergetico(
+      payload
+    );
+
+    if (response.success && response.data) {
       Swal.fire({
         ...swalTheme,
         icon: "success",
         title: "¡Calculado!",
-        text: "Tus datos han sido guardados exitosamente.",
+        text: "Tus datos han sido guardados.",
       });
-      onSuccess(data);
+      onSuccess(response.data);
+    } else {
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudieron guardar los datos: " + response.error,
+      });
     }
     setLoading(false);
   };

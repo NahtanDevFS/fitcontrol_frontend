@@ -1,7 +1,7 @@
 // services/routineService.ts
 
 import { api } from "@/lib/api";
-import { Rutina } from "@/types";
+import { Rutina, RutinaDia } from "@/types";
 
 // Tipos simplificados para la data que se envía.
 // Puedes ajustarlos a tus 'types' si lo necesitas.
@@ -9,6 +9,12 @@ interface RutinaData {
   nombre_rutina: string;
   id_usuario?: string; // Opcional, ya que no se usa en la actualización
   dias: any[];
+}
+
+interface TrackerData {
+  diaDeHoy: RutinaDia | null;
+  diaCumplido: boolean;
+  id_cumplimiento_rutina: number;
 }
 
 export const routineService = {
@@ -55,5 +61,19 @@ export const routineService = {
    */
   deleteRutina: (rutinaId: number) => {
     return api.delete(`/rutina/${rutinaId}`);
+  },
+
+  /**
+   * Obtiene los datos del tracker de rutina para el día actual.
+   */
+  getTodayRoutineTracker: (userId: string) => {
+    return api.get<TrackerData>(`/tracker/rutina/hoy/${userId}`);
+  },
+
+  /**
+   * Marca una rutina diaria como completada.
+   */
+  markDayAsCompleted: (complianceId: number) => {
+    return api.put(`/cumplimiento-rutina/${complianceId}`, { cumplido: true });
   },
 };

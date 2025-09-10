@@ -88,3 +88,56 @@ export interface CumplimientoDietaDia {
   dia_semana: string;
   cumplido: boolean;
 }
+
+export interface Progreso {
+  id_progreso: number;
+  id_usuario: string;
+  fecha_inicio_proceso: string;
+  fecha_final_proceso: string | null;
+  peso_actual: number;
+  peso_deseado: number;
+  objetivo: "bajar" | "subir";
+  estado: number;
+  peso_inicial: number;
+}
+
+export interface GastoEnergeticoData {
+  id_usuario: string;
+  sexo: "hombre" | "mujer";
+  edad: number;
+  altura_cm: number;
+  peso_kg: number;
+  nivel_actividad: number;
+  tmb: number;
+  calorias_mantener: number;
+  calorias_deficit: number;
+  calorias_superavit: number;
+  peso_ideal_kg: number;
+}
+
+export interface ProfileData {
+  nombre_usuario: string;
+  correo_usuario: string;
+  peso_actual: number | null;
+  racha_rutina: number;
+  racha_dieta: number;
+  unidad_peso: "kg" | "lbs";
+}
+
+export interface Usuario {
+  id_usuario: string;
+  nombre_usuario: string;
+  correo_usuario: string;
+  fecha_creacion: string;
+  estado: number;
+  unidad_peso: "kg" | "lbs";
+}
+
+export interface DashboardData {
+  nombreUsuario: string;
+  rachaRutina: number;
+  rachaDieta: number;
+  pesoActual: number | null;
+  metaPeso: number | null;
+  unidadPeso: "kg" | "lbs";
+}

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
+//import { supabase } from "@/lib/supabase";
 import {
   Dieta,
   TiempoComida,
@@ -12,6 +12,7 @@ import {
 import Swal from "sweetalert2";
 import { useTheme } from "@/components/ThemeContext";
 import "./dieta.css";
+import { dietService } from "@/services/DietService";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -46,56 +47,20 @@ export default function DietaPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
+  const [racha, setRacha] = useState(0);
+  const [calendario, setCalendario] = useState<any[]>([]);
 
   const { darkMode } = useTheme();
 
-  const fetchDieta = useCallback(async (currentUserId: string) => {
+  const fetchDietaCompleta = useCallback(async (currentUserId: string) => {
     setLoading(true);
-    let { data: dietaExistente } = await supabase
-      .from("dieta")
-      .select("*, dieta_alimento(*, dieta_alimento_detalle(*))")
-      .eq("id_usuario", currentUserId)
-      .maybeSingle();
-
-    if (!dietaExistente) {
-      const { data: nuevaDieta } = await supabase
-        .from("dieta")
-        .insert({
-          id_usuario: currentUserId,
-          nombre_dieta: "Mi Dieta Principal",
-        })
-        .select()
-        .single();
-      dietaExistente = { ...nuevaDieta, dieta_alimento: [] };
-    }
-
-    if (dietaExistente) {
-      const diasMap: Dieta["dias"] = {};
-      DIAS_SEMANA.forEach((dia) => {
-        diasMap[dia] = {};
-        TIEMPOS_COMIDA.forEach((tiempo) => {
-          diasMap[dia][tiempo] = {
-            id_dieta: dietaExistente.id_dieta,
-            tiempo_comida: tiempo,
-            dia_semana: dia,
-            alimentos: [],
-          };
-        });
-      });
-
-      dietaExistente.dieta_alimento.forEach((alimento: any) => {
-        const dia = alimento.dia_semana;
-        const tiempo = alimento.tiempo_comida;
-        if (diasMap[dia] && diasMap[dia][tiempo]) {
-          diasMap[dia][tiempo] = {
-            ...alimento,
-            alimentos: alimento.dieta_alimento_detalle.map((d: any) => ({
-              ...d,
-            })),
-          };
-        }
-      });
-      setDieta({ ...dietaExistente, dias: diasMap });
+    const response = await dietService.getDietPlan(currentUserId);
+    if (response.success && response.data) {
+      setDieta(response.data.dieta);
+      setRacha(response.data.racha);
+      setCalendario(response.data.calendario);
+    } else {
+      console.error("Error al cargar el plan de dieta:", response.error);
     }
     setLoading(false);
   }, []);
@@ -103,13 +68,13 @@ export default function DietaPage() {
   useEffect(() => {
     const storedUser = localStorage.getItem("userFitControl");
     if (storedUser) {
-      const userData: UserInfo = JSON.parse(storedUser);
+      const userData = JSON.parse(storedUser);
       setUserId(userData.id);
-      fetchDieta(userData.id);
+      fetchDietaCompleta(userData.id);
     } else {
       window.location.href = "/login";
     }
-  }, [fetchDieta]);
+  }, [fetchDietaCompleta]);
 
   const openAddFoodModal = (dia: string, tiempo: string) => {
     setModalData({ dia, tiempo, foodToEdit: undefined });
@@ -139,17 +104,15 @@ export default function DietaPage() {
       cancelButtonText: "Cancelar",
     });
     if (result.isConfirmed) {
-      const { error } = await supabase
-        .from("dieta_alimento_detalle")
-        .delete()
-        .eq("id_dieta_alimento_detalle", alimentoId);
+      // --- LLAMADA AL SERVICIO ---
+      const response = await dietService.deleteFood(alimentoId);
 
-      if (error) {
+      if (!response.success) {
         Swal.fire({
           ...swalTheme,
           icon: "error",
           title: "Error",
-          text: "No se pudo eliminar el alimento: " + error.message,
+          text: "No se pudo eliminar el alimento: " + response.error,
         });
       } else {
         Swal.fire({
@@ -160,7 +123,7 @@ export default function DietaPage() {
           showConfirmButton: false,
           timer: 1500,
         });
-        fetchDieta(userId!);
+        if (userId) fetchDietaCompleta(userId);
       }
     }
   };
@@ -182,14 +145,14 @@ export default function DietaPage() {
       {/* --- NUEVOS COMPONENTES DE CUMPLIMIENTO --- */}
       <DailyDietTracker
         key={`daily-${dieta.id_dieta}`}
-        dieta={dieta}
         userId={userId!}
         darkMode={darkMode}
+        onUpdate={() => fetchDietaCompleta(userId!)}
       />
       <DietStreakTracker
-        key={`streak-${dieta.id_dieta}`}
-        dieta={dieta}
-        userId={userId!}
+        racha={racha}
+        calendario={calendario}
+        loading={loading}
       />
 
       <h2 className="section-title">Editor de Plan Semanal</h2>
@@ -261,7 +224,7 @@ export default function DietaPage() {
           onClose={() => setIsModalOpen(false)}
           onFoodAdded={() => {
             setIsModalOpen(false);
-            fetchDieta(userId!);
+            fetchDietaCompleta(userId!);
           }}
           darkMode={darkMode}
         />
@@ -271,18 +234,20 @@ export default function DietaPage() {
 }
 
 function DailyDietTracker({
-  dieta,
-  userId,
   darkMode,
+  userId,
+  onUpdate,
 }: {
-  dieta: Dieta;
-  userId: string;
   darkMode: boolean;
+  userId: string;
+  onUpdate: () => void;
 }) {
-  const [comidasDeHoy, setComidasDeHoy] = useState<MealStatus[]>([]);
+  const [comidasDeHoy, setComidasDeHoy] = useState<any[]>([]);
   const [diaCumplido, setDiaCumplido] = useState(false);
+  const [idCumplimientoDia, setIdCumplimientoDia] = useState<number | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
-  const [isRecordChecked, setIsRecordChecked] = useState(false);
 
   const diasSemanaMapa: { [key: number]: string } = {
     0: "Domingo",
@@ -300,112 +265,53 @@ function DailyDietTracker({
   const nombreDiaHoy = diasSemanaMapa[hoy.getDay()];
 
   const fetchCompliance = useCallback(async () => {
-    if (isRecordChecked) return;
     setLoading(true);
-
-    const comidasProgramadas = Object.values(
-      dieta.dias[nombreDiaHoy] || {}
-    ).filter((meal) => meal.alimentos.length > 0 && meal.id_dieta_alimento);
-
-    if (comidasProgramadas.length === 0) {
-      setLoading(false);
-      setIsRecordChecked(true);
-      return;
+    const response = await dietService.getTodayDietTracker(userId);
+    if (response.success && response.data) {
+      setComidasDeHoy(response.data.comidasDeHoy);
+      setDiaCumplido(response.data.diaCumplido);
+      setIdCumplimientoDia(response.data.id_cumplimiento_dia);
     }
-
-    // 1. Verificar o crear el registro del DÍA
-    const { data: diaData } = await supabase
-      .from("cumplimiento_dieta_dia")
-      .select("cumplido")
-      .eq("id_usuario", userId)
-      .eq("fecha_a_cumplir", fechaLocalISO)
-      .maybeSingle();
-
-    if (diaData) {
-      setDiaCumplido(diaData.cumplido);
-    } else {
-      await supabase.from("cumplimiento_dieta_dia").insert({
-        id_usuario: userId,
-        id_dieta: dieta.id_dieta,
-        fecha_a_cumplir: fechaLocalISO,
-        dia_semana: nombreDiaHoy,
-      });
-      setDiaCumplido(false);
-    }
-
-    // 2. Verificar o crear registros de CADA COMIDA
-    const idsComidas = comidasProgramadas.map((c) => c.id_dieta_alimento!);
-    const { data: comidasData } = await supabase
-      .from("cumplimiento_dieta")
-      .select("*")
-      .eq("id_usuario", userId)
-      .eq("fecha_a_cumplir_dieta", fechaLocalISO)
-      .in("id_dieta_alimento", idsComidas);
-
-    const comidasStatusInicial: MealStatus[] = [];
-    const comidasACrear = [];
-
-    for (const comida of comidasProgramadas) {
-      const registroExistente = comidasData?.find(
-        (c) => c.id_dieta_alimento === comida.id_dieta_alimento
-      );
-      comidasStatusInicial.push({
-        ...comida,
-        cumplido: registroExistente?.cumplido || false,
-      });
-
-      if (!registroExistente) {
-        comidasACrear.push({
-          id_usuario: userId,
-          id_dieta_alimento: comida.id_dieta_alimento!,
-          fecha_a_cumplir_dieta: fechaLocalISO,
-        });
-      }
-    }
-
-    if (comidasACrear.length > 0) {
-      await supabase.from("cumplimiento_dieta").insert(comidasACrear);
-    }
-
-    setComidasDeHoy(comidasStatusInicial);
     setLoading(false);
-    setIsRecordChecked(true);
-  }, [dieta, userId, fechaLocalISO, nombreDiaHoy, isRecordChecked]);
+  }, [userId]);
 
   useEffect(() => {
     fetchCompliance();
   }, [fetchCompliance]);
 
-  const handleCheckMeal = async (mealId: number, newStatus: boolean) => {
+  const handleCheckMeal = async (meal: any, newStatus: boolean) => {
     setComidasDeHoy((prev) =>
       prev.map((c) =>
-        c.id_dieta_alimento === mealId ? { ...c, cumplido: newStatus } : c
+        c.id_dieta_alimento === meal.id_dieta_alimento
+          ? { ...c, cumplido: newStatus }
+          : c
       )
     );
-    await supabase
-      .from("cumplimiento_dieta")
-      .update({ cumplido: newStatus })
-      .eq("id_usuario", userId)
-      .eq("id_dieta_alimento", mealId)
-      .eq("fecha_a_cumplir_dieta", fechaLocalISO);
+    await dietService.updateMealCompliance(
+      meal.id_cumplimiento_dieta,
+      newStatus
+    );
   };
 
   const handleMarkDayComplete = async () => {
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
-    await supabase
-      .from("cumplimiento_dieta_dia")
-      .update({ cumplido: true })
-      .eq("id_usuario", userId)
-      .eq("fecha_a_cumplir", fechaLocalISO);
-    setDiaCumplido(true);
-    Swal.fire({
-      ...swalTheme,
-      icon: "success",
-      title: "¡Felicidades!",
-      text: "Has completado tu dieta de hoy.",
-      showConfirmButton: false,
-      timer: 2000,
-    });
+    if (!idCumplimientoDia) return;
+    const response = await dietService.updateDayCompliance(
+      idCumplimientoDia,
+      true
+    );
+    if (response.success) {
+      setDiaCumplido(true);
+      onUpdate(); // Llama a la función para recargar los datos de la racha
+      Swal.fire({
+        ...swalTheme,
+        icon: "success",
+        title: "¡Felicidades!",
+        text: "Has completado tu dieta de hoy.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
   };
 
   if (loading)
@@ -470,141 +376,20 @@ function DailyDietTracker({
 }
 
 function DietStreakTracker({
-  dieta,
-  userId,
+  racha,
+  calendario,
+  loading,
 }: {
-  dieta: Dieta;
-  userId: string;
+  racha: number;
+  calendario: any[];
+  loading: boolean;
 }) {
-  const [streak, setStreak] = useState(0);
-  const [diasCalendario, setDiasCalendario] = useState<
-    {
-      fecha: Date;
-      status: "completed" | "missed" | "rest" | "pending" | "future";
-    }[]
-  >([]);
-  const [loadingStreak, setLoadingStreak] = useState(true);
-
-  const diasSemanaMapa: { [key: number]: string } = {
-    0: "Domingo",
-    1: "Lunes",
-    2: "Martes",
-    3: "Miércoles",
-    4: "Jueves",
-    5: "Viernes",
-    6: "Sábado",
-  };
-
-  useEffect(() => {
-    const calcularRachaYCalendario = async () => {
-      setLoadingStreak(true);
-
-      // Obtenemos los días que tienen al menos una comida planificada
-      const diasConDieta = new Set<string>();
-      Object.values(dieta.dias).forEach((tiempos) => {
-        Object.values(tiempos).forEach((comida) => {
-          if (comida.alimentos.length > 0) {
-            diasConDieta.add(comida.dia_semana);
-          }
-        });
-      });
-
-      // Obtenemos todos los registros de cumplimiento de días completos
-      const { data: cumplimientos, error } = await supabase
-        .from("cumplimiento_dieta_dia")
-        .select("*")
-        .eq("id_usuario", userId)
-        .eq("id_dieta", dieta.id_dieta);
-
-      if (error) {
-        console.error("Error al obtener datos de cumplimiento de dieta", error);
-        setLoadingStreak(false);
-        return;
-      }
-
-      const cumplimientosMap = new Map(
-        cumplimientos.map((c: CumplimientoDietaDia) => [
-          c.fecha_a_cumplir,
-          c.cumplido,
-        ])
-      );
-
-      let rachaActual = 0;
-      const hoy = new Date();
-      const fechaHoyStr = `${hoy.getFullYear()}-${String(
-        hoy.getMonth() + 1
-      ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-
-      // Calculamos la racha de días pasados
-      for (let i = 1; i < 90; i++) {
-        // Revisamos hasta 90 días atrás
-        const diaAnterior = new Date();
-        diaAnterior.setDate(hoy.getDate() - i);
-        const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-        const fechaStr = `${diaAnterior.getFullYear()}-${String(
-          diaAnterior.getMonth() + 1
-        ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(2, "0")}`;
-
-        if (diasConDieta.has(nombreDia)) {
-          if (cumplimientosMap.get(fechaStr) === true) {
-            rachaActual++;
-          } else {
-            // Si el día tenía dieta pero no fue cumplido (o no existe el registro), se rompe la racha
-            break;
-          }
-        }
-        // Si es un día de descanso (cheat day), no hacemos nada y el bucle continúa
-      }
-
-      // Añadimos el día de hoy a la racha si está cumplido
-      if (cumplimientosMap.get(fechaHoyStr) === true) {
-        rachaActual++;
-      }
-      setStreak(rachaActual);
-
-      // Generamos los datos para el calendario de los últimos 35 días
-      const diasParaMostrar = [];
-      const hoySinHora = new Date(new Date().setHours(0, 0, 0, 0));
-
-      for (let i = 34; i >= 0; i--) {
-        const dia = new Date();
-        dia.setDate(hoy.getDate() - i);
-        dia.setHours(0, 0, 0, 0);
-
-        const fechaStr = `${dia.getFullYear()}-${String(
-          dia.getMonth() + 1
-        ).padStart(2, "0")}-${String(dia.getDate()).padStart(2, "0")}`;
-        const nombreDia = diasSemanaMapa[dia.getDay()];
-
-        let status: "completed" | "missed" | "rest" | "pending" | "future" =
-          "pending";
-
-        if (dia > hoySinHora) {
-          status = "future";
-        } else if (diasConDieta.has(nombreDia)) {
-          const cumplido = cumplimientosMap.get(fechaStr);
-          if (cumplido === true) {
-            status = "completed";
-          } else if (cumplido === false && dia < hoySinHora) {
-            status = "missed";
-          } else {
-            status = "pending";
-          }
-        } else {
-          status = "rest";
-        }
-        diasParaMostrar.push({ fecha: dia, status });
-      }
-      setDiasCalendario(diasParaMostrar);
-      setLoadingStreak(false);
-    };
-
-    calcularRachaYCalendario();
-  }, [dieta, userId]);
-
   const fillerDays = [];
-  if (diasCalendario.length > 0) {
-    const firstDayOfWeek = diasCalendario[0].fecha.getDay();
+  if (calendario.length > 0) {
+    // Se crea un objeto Date para obtener el día de la semana.
+    // OJO: Los strings de fecha "YYYY-MM-DD" se interpretan como UTC,
+    // por lo que usamos getUTCDay() para obtener el día correcto sin problemas de zona horaria.
+    const firstDayOfWeek = new Date(calendario[0].fecha).getUTCDay();
     for (let i = 0; i < firstDayOfWeek; i++) {
       fillerDays.push(
         <div key={`filler-${i}`} className="calendar-day-empty"></div>
@@ -616,11 +401,7 @@ function DietStreakTracker({
     <div className="streak-container">
       <div className="streak-counter">
         <h3>Racha de Dieta</h3>
-        {loadingStreak ? (
-          <p>...</p>
-        ) : (
-          <p className="streak-days">🥗 {streak} Días</p>
-        )}
+        {loading ? <p>...</p> : <p className="streak-days">🥗 {racha} Días</p>}
       </div>
       <div className="streak-calendar">
         <div className="calendar-header">
@@ -634,9 +415,9 @@ function DietStreakTracker({
         </div>
         <div className="calendar-grid">
           {fillerDays}
-          {diasCalendario.map(({ fecha, status }, index) => (
+          {calendario.map(({ fecha, status }, index) => (
             <div key={index} className={`calendar-day ${status}`}>
-              {fecha.getDate()}
+              {parseInt(fecha.split("-")[2], 10)}
             </div>
           ))}
         </div>
@@ -791,52 +572,38 @@ function AddFoodModal({
     };
 
     try {
+      let response;
       if (foodToEdit) {
-        const { error } = await supabase
-          .from("dieta_alimento_detalle")
-          .update(foodData)
-          .eq(
-            "id_dieta_alimento_detalle",
-            foodToEdit.id_dieta_alimento_detalle
-          );
-        if (error) throw error;
+        // --- LLAMADA PARA ACTUALIZAR ---
+        response = await dietService.updateFood(
+          foodToEdit.id_dieta_alimento_detalle!,
+          foodData
+        );
       } else {
-        const { data: meal } = await supabase
-          .from("dieta_alimento")
-          .select("id_dieta_alimento")
-          .eq("id_dieta", dietaId)
-          .eq("dia_semana", dayName)
-          .eq("tiempo_comida", mealName)
-          .maybeSingle();
-        let mealId = meal?.id_dieta_alimento;
-        if (!meal) {
-          const { data: newMeal, error } = await supabase
-            .from("dieta_alimento")
-            .insert({
-              id_dieta: dietaId,
-              dia_semana: dayName,
-              tiempo_comida: mealName,
-            })
-            .select("id_dieta_alimento")
-            .single();
-          if (error) throw error;
-          mealId = newMeal.id_dieta_alimento;
-        }
-        await supabase
-          .from("dieta_alimento_detalle")
-          .insert({ ...foodData, id_dieta_alimento: mealId });
+        // --- LLAMADA PARA CREAR ---
+        const payload = {
+          ...foodData,
+          id_dieta: dietaId,
+          dia_semana: dayName,
+          tiempo_comida: mealName,
+        };
+        response = await dietService.addFood(payload);
       }
-      Swal.fire({
-        ...swalTheme,
-        icon: "success",
-        title: "¡Guardado!",
-        text: `Alimento ${
-          foodToEdit ? "actualizado" : "añadido"
-        } exitosamente.`,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      onFoodAdded();
+      if (response.success) {
+        Swal.fire({
+          ...swalTheme,
+          icon: "success",
+          title: "¡Guardado!",
+          text: `Alimento ${
+            foodToEdit ? "actualizado" : "añadido"
+          } exitosamente.`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        onFoodAdded();
+      } else {
+        throw new Error(response.error);
+      }
     } catch (error: any) {
       Swal.fire({
         ...swalTheme,

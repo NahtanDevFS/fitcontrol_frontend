@@ -11,6 +11,7 @@ import {
 import RoutineCard from "@/components/RoutineCard";
 import RoutineForm from "@/components/RoutineForm";
 import { supabase } from "@/lib/supabase";
+import Swal from "sweetalert2";
 import "./rutina.css";
 
 // --- TIPOS ---
@@ -32,6 +33,8 @@ export default function RutinasPage() {
   const [rutinaParaEditar, setRutinaParaEditar] = useState<Rutina | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [rutinaActiva, setRutinaActiva] = useState<Rutina | null>(null);
+  const [racha, setRacha] = useState(0);
+  const [calendario, setCalendario] = useState<any[]>([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userFitControl");
@@ -106,7 +109,8 @@ export default function RutinasPage() {
         <>
           <DailyRoutineTracker
             key={`daily-${rutinaActiva.id_rutina}`}
-            rutinaActiva={rutinaActiva}
+            userId={userId!}
+            onUpdate={() => fetchRutinas(userId!)}
           />
           <StreakTracker
             key={`streak-${rutinaActiva.id_rutina}`}
@@ -154,73 +158,41 @@ export default function RutinasPage() {
   );
 }
 
-// --- SUB-COMPONENTE PARA EL SEGUIMIENTO DIARIO (SIN CAMBIOS) ---
-function DailyRoutineTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
+// --- SUB-COMPONENTE PARA EL SEGUIMIENTO DIARIO ---
+function DailyRoutineTracker({
+  userId,
+  onUpdate,
+}: {
+  userId: string;
+  onUpdate: () => void;
+}) {
   const [diaDeHoy, setDiaDeHoy] = useState<RutinaDia | null>(null);
   const [ejercicios, setEjercicios] = useState<DailyExercise[]>([]);
   const [diaCumplido, setDiaCumplido] = useState(false);
-  const [loadingTracker, setLoadingTracker] = useState(true);
-  const [isRecordChecked, setIsRecordChecked] = useState(false);
-  const diasSemanaMapa: { [key: number]: string } = {
-    0: "Domingo",
-    1: "Lunes",
-    2: "Martes",
-    3: "Miércoles",
-    4: "Jueves",
-    5: "Viernes",
-    6: "Sábado",
-  };
+  const [idCumplimiento, setIdCumplimiento] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!rutinaActiva || isRecordChecked) return;
-
     const getRutinaDeHoy = async () => {
-      setLoadingTracker(true);
-      const hoy = new Date();
-      const year = hoy.getFullYear();
-      const month = String(hoy.getMonth() + 1).padStart(2, "0");
-      const day = String(hoy.getDate()).padStart(2, "0");
-      const fechaLocalISO = `${year}-${month}-${day}`;
-      const nombreDiaHoy = diasSemanaMapa[hoy.getDay()];
-
-      const rutinaDia = rutinaActiva.dias.find(
-        (d) => d.dia_semana === nombreDiaHoy
-      );
-
-      if (rutinaDia && rutinaDia.id_rutina_dia_semana) {
-        setDiaDeHoy(rutinaDia);
-        setEjercicios(
-          rutinaDia.ejercicios.map((ej) => ({ ...ej, completado: false }))
-        );
-
-        const { data, error } = await supabase
-          .from("cumplimiento_rutina")
-          .select("cumplido")
-          .eq("id_rutina_dia_semana", rutinaDia.id_rutina_dia_semana)
-          .eq("fecha_a_cumplir", fechaLocalISO)
-          .maybeSingle();
-
-        if (error && error.code !== "PGRST116") {
-          console.error("Error al buscar cumplimiento:", error);
-        } else if (data) {
-          setDiaCumplido(data.cumplido);
-        } else {
-          await supabase.from("cumplimiento_rutina").insert({
-            id_rutina_dia_semana: rutinaDia.id_rutina_dia_semana,
-            fecha_a_cumplir: fechaLocalISO,
-            cumplido: false,
-          });
-          setDiaCumplido(false);
+      setLoading(true);
+      const response = await routineService.getTodayRoutineTracker(userId);
+      if (response.success && response.data) {
+        setDiaDeHoy(response.data.diaDeHoy);
+        setDiaCumplido(response.data.diaCumplido);
+        setIdCumplimiento(response.data.id_cumplimiento_rutina);
+        if (response.data.diaDeHoy) {
+          setEjercicios(
+            response.data.diaDeHoy.ejercicios.map((ej) => ({
+              ...ej,
+              completado: false,
+            }))
+          );
         }
-      } else {
-        setDiaDeHoy(null);
-        setEjercicios([]);
       }
-      setIsRecordChecked(true);
-      setLoadingTracker(false);
+      setLoading(false);
     };
     getRutinaDeHoy();
-  }, [rutinaActiva, isRecordChecked]);
+  }, [userId]);
 
   const handleCheckEjercicio = (index: number) => {
     const nuevosEjercicios = [...ejercicios];
@@ -229,37 +201,34 @@ function DailyRoutineTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
   };
 
   const handleMarcarDiaCumplido = async () => {
-    if (!diaDeHoy?.id_rutina_dia_semana) return;
-    const hoy = new Date();
-    const fechaLocalISO = `${hoy.getFullYear()}-${String(
-      hoy.getMonth() + 1
-    ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-    const { error } = await supabase
-      .from("cumplimiento_rutina")
-      .update({ cumplido: true })
-      .eq("id_rutina_dia_semana", diaDeHoy.id_rutina_dia_semana)
-      .eq("fecha_a_cumplir", fechaLocalISO);
-    if (error) {
-      alert("Error al marcar el día como cumplido.");
-    } else {
+    if (!idCumplimiento) return;
+    const response = await routineService.markDayAsCompleted(idCumplimiento);
+    if (response.success) {
       setDiaCumplido(true);
-      alert("¡Felicidades! Has cumplido tu rutina de hoy.");
+      onUpdate();
+      Swal.fire("¡Felicidades!", "Has cumplido tu rutina de hoy.", "success");
+    } else {
+      Swal.fire("Error", "No se pudo marcar el día como cumplido.", "error");
     }
   };
 
-  if (loadingTracker)
+  if (loading) {
     return (
       <div className="tracker-container">
         <p>Cargando rutina de hoy...</p>
       </div>
     );
-  if (!diaDeHoy)
+  }
+
+  if (!diaDeHoy) {
     return (
       <div className="tracker-container">
         <h3>Hoy es tu día de descanso</h3>
         <p>Aprovecha para recuperar energías.</p>
       </div>
     );
+  }
+
   const todosCompletados = ejercicios.every((ej) => ej.completado);
 
   return (
@@ -312,7 +281,7 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
   const [streak, setStreak] = useState(0);
   const [diasCalendario, setDiasCalendario] = useState<
     {
-      fecha: Date;
+      fecha: string; // La fecha es un string
       status: "completed" | "missed" | "rest" | "pending" | "future";
     }[]
   >([]);
@@ -337,19 +306,18 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
         .map((d) => d.id_rutina_dia_semana)
         .filter(Boolean);
 
-      const { data: cumplimientos, error } = await supabase
-        .from("cumplimiento_rutina")
-        .select("*")
-        .in("id_rutina_dia_semana", idsDiasConRutina);
-
-      if (error) {
-        console.error("Error al obtener datos de cumplimiento", error);
+      if (idsDiasConRutina.length === 0) {
         setLoadingStreak(false);
         return;
       }
 
+      const { data: cumplimientos } = await supabase
+        .from("cumplimiento_rutina")
+        .select("*")
+        .in("id_rutina_dia_semana", idsDiasConRutina);
+
       const cumplimientosMap = new Map(
-        cumplimientos.map((c: CumplimientoRutina) => [
+        (cumplimientos || []).map((c: CumplimientoRutina) => [
           c.fecha_a_cumplir,
           c.cumplido,
         ])
@@ -357,17 +325,17 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
 
       let rachaActual = 0;
       const hoy = new Date();
-      const fechaHoyStr = `${hoy.getFullYear()}-${String(
-        hoy.getMonth() + 1
-      ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+      const fechaHoyStr = hoy.toISOString().split("T")[0];
+
+      if (cumplimientosMap.get(fechaHoyStr) === true) {
+        rachaActual++;
+      }
 
       for (let i = 1; i < 90; i++) {
         const diaAnterior = new Date(hoy);
         diaAnterior.setDate(hoy.getDate() - i);
         const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-        const fechaStr = `${diaAnterior.getFullYear()}-${String(
-          diaAnterior.getMonth() + 1
-        ).padStart(2, "0")}-${String(diaAnterior.getDate()).padStart(2, "0")}`;
+        const fechaStr = diaAnterior.toISOString().split("T")[0];
 
         if (diasConRutina.has(nombreDia)) {
           if (cumplimientosMap.get(fechaStr) === true) {
@@ -377,39 +345,28 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
           }
         }
       }
-
-      if (cumplimientosMap.get(fechaHoyStr) === true) {
-        rachaActual++;
-      }
       setStreak(rachaActual);
 
       const diasParaMostrar = [];
+      const hoySinHora = new Date(new Date().setHours(0, 0, 0, 0));
       for (let i = 34; i >= 0; i--) {
         const dia = new Date();
         dia.setDate(hoy.getDate() - i);
-        const fechaStr = `${dia.getFullYear()}-${String(
-          dia.getMonth() + 1
-        ).padStart(2, "0")}-${String(dia.getDate()).padStart(2, "0")}`;
+        const fechaStr = dia.toISOString().split("T")[0];
         const nombreDia = diasSemanaMapa[dia.getDay()];
-
         let status: "completed" | "missed" | "rest" | "pending" | "future" =
           "pending";
 
-        if (dia.setHours(0, 0, 0, 0) > hoy.setHours(0, 0, 0, 0)) {
+        if (dia.setHours(0, 0, 0, 0) > hoySinHora.setHours(0, 0, 0, 0)) {
           status = "future";
         } else if (diasConRutina.has(nombreDia)) {
           const cumplido = cumplimientosMap.get(fechaStr);
           if (cumplido === true) status = "completed";
-          else if (
-            cumplido === false &&
-            dia.setHours(0, 0, 0, 0) < hoy.setHours(0, 0, 0, 0)
-          )
-            status = "missed";
-          else status = "pending";
+          else if (cumplido === false && dia < hoySinHora) status = "missed";
         } else {
           status = "rest";
         }
-        diasParaMostrar.push({ fecha: dia, status });
+        diasParaMostrar.push({ fecha: fechaStr, status });
       }
       setDiasCalendario(diasParaMostrar);
       setLoadingStreak(false);
@@ -418,11 +375,9 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
     calcularRachaYCalendario();
   }, [rutinaActiva]);
 
-  // --- CORRECCIÓN DE ALINEACIÓN ---
-  // Calculamos los días vacíos necesarios para alinear la primera semana.
   const fillerDays = [];
   if (diasCalendario.length > 0) {
-    const firstDayOfWeek = diasCalendario[0].fecha.getDay(); // 0 = Domingo, 1 = Lunes...
+    const firstDayOfWeek = new Date(diasCalendario[0].fecha).getUTCDay();
     for (let i = 0; i < firstDayOfWeek; i++) {
       fillerDays.push(
         <div key={`filler-${i}`} className="calendar-day-empty"></div>
@@ -451,12 +406,10 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
           <span>S</span>
         </div>
         <div className="calendar-grid">
-          {/* Primero renderizamos los días vacíos */}
           {fillerDays}
-          {/* Luego los días reales del calendario */}
           {diasCalendario.map(({ fecha, status }, index) => (
             <div key={index} className={`calendar-day ${status}`}>
-              {fecha.getDate()}
+              {parseInt(fecha.split("-")[2], 10)}
             </div>
           ))}
         </div>

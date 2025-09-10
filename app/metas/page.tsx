@@ -2,26 +2,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+//import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 import { useTheme } from "@/components/ThemeContext";
+import { progressService } from "@/services/ProgressService";
+import { Progreso } from "@/types";
 import "./metas.css";
 
 // --- TIPOS ---
 interface UserInfo {
   id: string;
 }
-interface Progreso {
-  id_progreso: number;
-  id_usuario: string;
-  fecha_inicio_proceso: string;
-  fecha_final_proceso: string | null;
-  peso_actual: number;
-  peso_deseado: number;
-  objetivo: "bajar" | "subir";
-  estado: number;
-  peso_inicial: number;
-}
+
 type UnidadPeso = "kg" | "lbs";
 
 const KG_TO_LBS = 2.20462;
@@ -38,36 +30,28 @@ export default function MetasPage() {
   useEffect(() => {
     const storedUser = localStorage.getItem("userFitControl");
     if (storedUser) {
-      const userData: UserInfo = JSON.parse(storedUser);
+      const userData = JSON.parse(storedUser);
       setUserId(userData.id);
+      // Llamamos a la función que ahora usa nuestro servicio
+      fetchProgresoActivo(userData.id);
     } else {
       console.error(
         "No se encontró información del usuario. Redirigiendo al login..."
       );
       window.location.href = "/login";
     }
-  }, []);
+  }, []); // Se ejecuta solo una vez al montar el componente
 
   const fetchProgresoActivo = async (id: string) => {
     setLoading(true);
-    // Obtenemos los datos del progreso y la preferencia de unidad en paralelo
-    const { data: progresoData } = await supabase
-      .from("progreso_usuario")
-      .select("*")
-      .eq("id_usuario", id)
-      .eq("estado", 1)
-      .maybeSingle();
-    const { data: usuarioData } = await supabase
-      .from("usuario")
-      .select("unidad_peso")
-      .eq("id_usuario", id)
-      .single();
+    const response = await progressService.getProgresoActivo(id);
 
-    if (usuarioData?.unidad_peso) {
-      setUnidadPeso(usuarioData.unidad_peso as UnidadPeso);
+    if (response.success && response.data) {
+      setProgresoActivo(response.data.progreso);
+      setUnidadPeso(response.data.unidad_peso);
+    } else {
+      console.error("Error al cargar el progreso:", response.error);
     }
-
-    setProgresoActivo(progresoData);
     setLoading(false);
   };
 
@@ -167,6 +151,9 @@ function CreateGoalForm({
     }
 
     // --- CONVERSIÓN CLAVE ---
+    // Nos aseguramos de enviar siempre el peso en KG al backend
+    let pa_kg = pa;
+    let pd_kg = pd;
     // Si la unidad es libras, convertimos a kg antes de guardar
     if (unidadPeso === "lbs") {
       pa = pa / KG_TO_LBS;
@@ -175,24 +162,14 @@ function CreateGoalForm({
 
     const objetivo = pd < pa ? "bajar" : "subir";
 
-    const { error } = await supabase.from("progreso_usuario").insert({
+    // LLAMADA A LA API
+    const response = await progressService.createProgreso({
       id_usuario: userId,
       peso_actual: pa,
       peso_deseado: pd,
-      objetivo,
-      estado: 1,
-      peso_inicial: pa,
     });
 
-    if (error) {
-      Swal.fire({
-        ...swalTheme,
-        icon: "error",
-        title: "Oops...",
-        text: "Error al crear la meta: " + error.message,
-        confirmButtonColor: "#ffe70e",
-      });
-    } else {
+    if (response.success) {
       Swal.fire({
         ...swalTheme,
         icon: "success",
@@ -201,6 +178,14 @@ function CreateGoalForm({
         confirmButtonColor: "#ffe70e",
       });
       onMetaCreada();
+    } else {
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Oops...",
+        text: "Error al crear la meta: " + response.error,
+        confirmButtonColor: "#ffe70e",
+      });
     }
     setLoading(false);
   };
@@ -311,19 +296,15 @@ function ProgressTracker({
       pa = pa / KG_TO_LBS;
     }
 
-    const { error } = await supabase
-      .from("progreso_usuario")
-      .update({ peso_actual: pa })
-      .eq("id_progreso", progreso.id_progreso);
+    // --- LLAMADA A LA API PARA ACTUALIZAR ---
+    const response = await progressService.updateProgreso(
+      progreso.id_progreso,
+      {
+        peso_actual: pa,
+      }
+    );
 
-    if (error) {
-      Swal.fire({
-        ...swalTheme,
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el peso: " + error.message,
-      });
-    } else {
+    if (response.success) {
       Swal.fire({
         ...swalTheme,
         icon: "success",
@@ -332,6 +313,13 @@ function ProgressTracker({
         timer: 1500,
       });
       onMetaCambiada();
+    } else {
+      Swal.fire({
+        ...swalTheme,
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar el peso: " + response.error,
+      });
     }
     setLoading(false);
   };
@@ -352,19 +340,19 @@ function ProgressTracker({
 
     if (result.isConfirmed) {
       setLoading(true);
-      const { error } = await supabase
-        .from("progreso_usuario")
-        .update({ estado: 2, fecha_final_proceso: new Date().toISOString() })
-        .eq("id_progreso", progreso.id_progreso);
-      if (error) {
+      // --- LLAMADA A LA API PARA FINALIZAR ---
+      const response = await progressService.finishProgreso(
+        progreso.id_progreso
+      );
+      if (response.success) {
+        onMetaCambiada();
+      } else {
         Swal.fire({
           ...swalTheme,
           icon: "error",
           title: "Error",
-          text: "No se pudo finalizar la meta: " + error.message,
+          text: "No se pudo finalizar la meta: " + response.error,
         });
-      } else {
-        onMetaCambiada();
       }
       setLoading(false);
     }
