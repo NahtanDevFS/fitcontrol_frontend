@@ -19,6 +19,7 @@ import {
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import { supabase } from "@/lib/supabase"; // Corregido: el cliente debe estar en un archivo separado, ej: lib/supabaseClient.ts
+import { routineService } from "@/services/RoutineService";
 
 // --- TIPOS ---
 type FormValues = {

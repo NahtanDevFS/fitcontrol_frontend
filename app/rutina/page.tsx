@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { routineService } from "@/services/RoutineService";
-import {
-  Rutina,
-  RutinaDia,
-  RutinaDiaEjercicio,
-  CumplimientoRutina,
-} from "@/types";
+import { Rutina, RutinaDia, RutinaDiaEjercicio } from "@/types";
 import RoutineCard from "@/components/RoutineCard";
 import RoutineForm from "@/components/RoutineForm";
-import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 import "./rutina.css";
 
@@ -36,37 +30,43 @@ export default function RutinasPage() {
   const [racha, setRacha] = useState(0);
   const [calendario, setCalendario] = useState<any[]>([]);
 
+  const fetchRutinasCompletas = useCallback(async (id: string) => {
+    setLoading(true);
+    const response = await routineService.getRutinasCompletas(id);
+    if (response.success && response.data) {
+      setRutinas(response.data.rutinas);
+      setRutinaActiva(response.data.rutinaActiva);
+      setRacha(response.data.racha);
+      setCalendario(response.data.calendario);
+    } else {
+      console.error("Error al cargar las rutinas:", response.error);
+      Swal.fire(
+        "Error",
+        "No se pudieron cargar los datos de la rutina.",
+        "error"
+      );
+    }
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("userFitControl");
     if (storedUser) {
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
     } else {
-      console.error("No se encontró información del usuario.");
+      console.error(
+        "No se encontró información del usuario. Redirigiendo a login..."
+      );
+      window.location.href = "/login";
     }
   }, []);
 
-  const fetchRutinas = async (id: string) => {
-    setLoading(true);
-    const response = await routineService.getRutinasByUserId(id);
-    if (response.success && response.data) {
-      const data = response.data;
-      const rutinasComoArray = Array.isArray(data) ? data : [data];
-      setRutinas(rutinasComoArray);
-      if (rutinasComoArray.length > 0) {
-        setRutinaActiva(rutinasComoArray[0]);
-      }
-    } else {
-      console.error("Error al cargar las rutinas:", response.error);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (userId) {
-      fetchRutinas(userId);
+      fetchRutinasCompletas(userId);
     }
-  }, [userId]);
+  }, [userId, fetchRutinasCompletas]);
 
   const handleOpenModalParaCrear = () => {
     setRutinaParaEditar(null);
@@ -85,15 +85,19 @@ export default function RutinasPage() {
     ) {
       const response = await routineService.deleteRutina(rutinaId);
       if (response.success) {
-        fetchRutinas(userId);
+        fetchRutinasCompletas(userId);
       } else {
         alert(`Error al eliminar la rutina: ${response.error}`);
       }
     }
   };
 
-  if (!userId) {
-    return <p>Cargando información de usuario...</p>;
+  if (loading) {
+    return (
+      <div className="rutinas-container">
+        <p>Cargando rutinas...</p>
+      </div>
+    );
   }
 
   return (
@@ -105,35 +109,33 @@ export default function RutinasPage() {
         </button>
       </header>
 
-      {rutinaActiva && (
+      {rutinaActiva && userId && (
         <>
           <DailyRoutineTracker
             key={`daily-${rutinaActiva.id_rutina}`}
-            userId={userId!}
-            onUpdate={() => fetchRutinas(userId!)}
+            userId={userId}
+            onUpdate={() => fetchRutinasCompletas(userId)}
           />
           <StreakTracker
             key={`streak-${rutinaActiva.id_rutina}`}
-            rutinaActiva={rutinaActiva}
+            racha={racha}
+            calendario={calendario}
+            loadingStreak={loading}
           />
         </>
       )}
 
       <h2 className="section-title">Biblioteca de Rutinas</h2>
-      {loading ? (
-        <p>Cargando rutinas...</p>
-      ) : (
-        <div className="rutinas-grid">
-          {rutinas.map((rutina) => (
-            <RoutineCard
-              key={rutina.id_rutina}
-              rutina={rutina}
-              onDelete={handleDelete}
-              onEdit={handleOpenModalParaEditar}
-            />
-          ))}
-        </div>
-      )}
+      <div className="rutinas-grid">
+        {rutinas.map((rutina) => (
+          <RoutineCard
+            key={rutina.id_rutina}
+            rutina={rutina}
+            onDelete={handleDelete}
+            onEdit={handleOpenModalParaEditar}
+          />
+        ))}
+      </div>
 
       {rutinas.length === 0 && !loading && (
         <div className="empty-state">
@@ -142,13 +144,13 @@ export default function RutinasPage() {
         </div>
       )}
 
-      {isModalOpen && (
+      {isModalOpen && userId && (
         <RoutineForm
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSuccess={() => {
             setIsModalOpen(false);
-            if (userId) fetchRutinas(userId);
+            if (userId) fetchRutinasCompletas(userId);
           }}
           userId={userId}
           rutinaExistente={rutinaParaEditar}
@@ -191,7 +193,9 @@ function DailyRoutineTracker({
       }
       setLoading(false);
     };
-    getRutinaDeHoy();
+    if (userId) {
+      getRutinaDeHoy();
+    }
   }, [userId]);
 
   const handleCheckEjercicio = (index: number) => {
@@ -212,23 +216,19 @@ function DailyRoutineTracker({
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div className="tracker-container">
         <p>Cargando rutina de hoy...</p>
       </div>
     );
-  }
-
-  if (!diaDeHoy) {
+  if (!diaDeHoy)
     return (
       <div className="tracker-container">
         <h3>Hoy es tu día de descanso</h3>
         <p>Aprovecha para recuperar energías.</p>
       </div>
     );
-  }
-
   const todosCompletados = ejercicios.every((ej) => ej.completado);
 
   return (
@@ -243,7 +243,7 @@ function DailyRoutineTracker({
           <ul className="exercise-list">
             {ejercicios.map((ej, index) => (
               <li
-                key={ej.ejercicio?.id_ejercicio || index}
+                key={ej.id_rutina_dia_semana_ejercicio || index}
                 className={ej.completado ? "completado" : ""}
               >
                 <label>
@@ -276,108 +276,19 @@ function DailyRoutineTracker({
   );
 }
 
-// --- NUEVO COMPONENTE PARA EL CALENDARIO Y RACHA (CON ALINEACIÓN CORREGIDA) ---
-function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
-  const [streak, setStreak] = useState(0);
-  const [diasCalendario, setDiasCalendario] = useState<
-    {
-      fecha: string; // La fecha es un string
-      status: "completed" | "missed" | "rest" | "pending" | "future";
-    }[]
-  >([]);
-  const [loadingStreak, setLoadingStreak] = useState(true);
-
-  const diasSemanaMapa: { [key: number]: string } = {
-    0: "Domingo",
-    1: "Lunes",
-    2: "Martes",
-    3: "Miércoles",
-    4: "Jueves",
-    5: "Viernes",
-    6: "Sábado",
-  };
-
-  useEffect(() => {
-    const calcularRachaYCalendario = async () => {
-      setLoadingStreak(true);
-
-      const diasConRutina = new Set(rutinaActiva.dias.map((d) => d.dia_semana));
-      const idsDiasConRutina = rutinaActiva.dias
-        .map((d) => d.id_rutina_dia_semana)
-        .filter(Boolean);
-
-      if (idsDiasConRutina.length === 0) {
-        setLoadingStreak(false);
-        return;
-      }
-
-      const { data: cumplimientos } = await supabase
-        .from("cumplimiento_rutina")
-        .select("*")
-        .in("id_rutina_dia_semana", idsDiasConRutina);
-
-      const cumplimientosMap = new Map(
-        (cumplimientos || []).map((c: CumplimientoRutina) => [
-          c.fecha_a_cumplir,
-          c.cumplido,
-        ])
-      );
-
-      let rachaActual = 0;
-      const hoy = new Date();
-      const fechaHoyStr = hoy.toISOString().split("T")[0];
-
-      if (cumplimientosMap.get(fechaHoyStr) === true) {
-        rachaActual++;
-      }
-
-      for (let i = 1; i < 90; i++) {
-        const diaAnterior = new Date(hoy);
-        diaAnterior.setDate(hoy.getDate() - i);
-        const nombreDia = diasSemanaMapa[diaAnterior.getDay()];
-        const fechaStr = diaAnterior.toISOString().split("T")[0];
-
-        if (diasConRutina.has(nombreDia)) {
-          if (cumplimientosMap.get(fechaStr) === true) {
-            rachaActual++;
-          } else {
-            break;
-          }
-        }
-      }
-      setStreak(rachaActual);
-
-      const diasParaMostrar = [];
-      const hoySinHora = new Date(new Date().setHours(0, 0, 0, 0));
-      for (let i = 34; i >= 0; i--) {
-        const dia = new Date();
-        dia.setDate(hoy.getDate() - i);
-        const fechaStr = dia.toISOString().split("T")[0];
-        const nombreDia = diasSemanaMapa[dia.getDay()];
-        let status: "completed" | "missed" | "rest" | "pending" | "future" =
-          "pending";
-
-        if (dia.setHours(0, 0, 0, 0) > hoySinHora.setHours(0, 0, 0, 0)) {
-          status = "future";
-        } else if (diasConRutina.has(nombreDia)) {
-          const cumplido = cumplimientosMap.get(fechaStr);
-          if (cumplido === true) status = "completed";
-          else if (cumplido === false && dia < hoySinHora) status = "missed";
-        } else {
-          status = "rest";
-        }
-        diasParaMostrar.push({ fecha: fechaStr, status });
-      }
-      setDiasCalendario(diasParaMostrar);
-      setLoadingStreak(false);
-    };
-
-    calcularRachaYCalendario();
-  }, [rutinaActiva]);
-
+// --- SUB-COMPONENTE PARA LA RACHA Y CALENDARIO ---
+function StreakTracker({
+  racha,
+  calendario,
+  loadingStreak,
+}: {
+  racha: number;
+  calendario: any[];
+  loadingStreak: boolean;
+}) {
   const fillerDays = [];
-  if (diasCalendario.length > 0) {
-    const firstDayOfWeek = new Date(diasCalendario[0].fecha).getUTCDay();
+  if (calendario.length > 0) {
+    const firstDayOfWeek = new Date(calendario[0].fecha).getUTCDay();
     for (let i = 0; i < firstDayOfWeek; i++) {
       fillerDays.push(
         <div key={`filler-${i}`} className="calendar-day-empty"></div>
@@ -392,7 +303,7 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
         {loadingStreak ? (
           <p>...</p>
         ) : (
-          <p className="streak-days">🔥 {streak} Días</p>
+          <p className="streak-days">🔥 {racha} Días</p>
         )}
       </div>
       <div className="streak-calendar">
@@ -407,7 +318,7 @@ function StreakTracker({ rutinaActiva }: { rutinaActiva: Rutina }) {
         </div>
         <div className="calendar-grid">
           {fillerDays}
-          {diasCalendario.map(({ fecha, status }, index) => (
+          {calendario.map(({ fecha, status }, index) => (
             <div key={index} className={`calendar-day ${status}`}>
               {parseInt(fecha.split("-")[2], 10)}
             </div>

@@ -17,6 +17,13 @@ interface TrackerData {
   id_cumplimiento_rutina: number;
 }
 
+interface RutinaCompletaResponse {
+  rutinas: Rutina[];
+  rutinaActiva: Rutina | null;
+  racha: number;
+  calendario: any[];
+}
+
 export const routineService = {
   /**
    * Obtiene TODAS las rutinas de un USUARIO.
@@ -61,6 +68,13 @@ export const routineService = {
    */
   deleteRutina: (rutinaId: number) => {
     return api.delete(`/rutina/${rutinaId}`);
+  },
+
+  /**
+   * Obtiene todos los datos necesarios para la página de rutinas.
+   */
+  getRutinasCompletas: (userId: string) => {
+    return api.get<RutinaCompletaResponse>(`/rutina/completa/${userId}`);
   },
 
   /**
