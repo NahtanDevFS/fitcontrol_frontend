@@ -259,9 +259,6 @@ function DailyDietTracker({
     6: "Sábado",
   };
   const hoy = new Date();
-  const fechaLocalISO = `${hoy.getFullYear()}-${String(
-    hoy.getMonth() + 1
-  ).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
   const nombreDiaHoy = diasSemanaMapa[hoy.getDay()];
 
   const fetchCompliance = useCallback(async () => {
@@ -276,10 +273,13 @@ function DailyDietTracker({
   }, [userId]);
 
   useEffect(() => {
-    fetchCompliance();
-  }, [fetchCompliance]);
+    if (userId) {
+      fetchCompliance();
+    }
+  }, [userId, fetchCompliance]);
 
   const handleCheckMeal = async (meal: any, newStatus: boolean) => {
+    // Actualización optimista de la UI (funciona porque 'meal' es ahora el objeto completo)
     setComidasDeHoy((prev) =>
       prev.map((c) =>
         c.id_dieta_alimento === meal.id_dieta_alimento
@@ -287,6 +287,7 @@ function DailyDietTracker({
           : c
       )
     );
+    // Llamada a la API con el ID de cumplimiento correcto
     await dietService.updateMealCompliance(
       meal.id_cumplimiento_dieta,
       newStatus
@@ -302,7 +303,7 @@ function DailyDietTracker({
     );
     if (response.success) {
       setDiaCumplido(true);
-      onUpdate(); // Llama a la función para recargar los datos de la racha
+      onUpdate(); // Recarga los datos de la racha
       Swal.fire({
         ...swalTheme,
         icon: "success",
@@ -314,19 +315,22 @@ function DailyDietTracker({
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="tracker-container">
         <p>Cargando cumplimiento de dieta...</p>
       </div>
     );
-  if (comidasDeHoy.length === 0)
+  }
+
+  if (comidasDeHoy.length === 0) {
     return (
       <div className="tracker-container">
         <h3>Hoy es un Cheat Day</h3>
         <p>No tienes comidas registradas para hoy.</p>
       </div>
     );
+  }
 
   const allMealsChecked = comidasDeHoy.every((c) => c.cumplido);
 
@@ -349,12 +353,9 @@ function DailyDietTracker({
                   <input
                     type="checkbox"
                     checked={comida.cumplido}
-                    onChange={(e) =>
-                      handleCheckMeal(
-                        comida.id_dieta_alimento!,
-                        e.target.checked
-                      )
-                    }
+                    // --- CORRECCIÓN AQUÍ ---
+                    // Pasamos el objeto 'comida' completo en lugar de solo su ID.
+                    onChange={(e) => handleCheckMeal(comida, e.target.checked)}
                   />
                   <span className="meal-name">{comida.tiempo_comida}</span>
                 </label>

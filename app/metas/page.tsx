@@ -152,8 +152,8 @@ function CreateGoalForm({
 
     // --- CONVERSIÓN CLAVE ---
     // Nos aseguramos de enviar siempre el peso en KG al backend
-    let pa_kg = pa;
-    let pd_kg = pd;
+    //let pa_kg = pa;
+    //let pd_kg = pd;
     // Si la unidad es libras, convertimos a kg antes de guardar
     if (unidadPeso === "lbs") {
       pa = pa / KG_TO_LBS;
