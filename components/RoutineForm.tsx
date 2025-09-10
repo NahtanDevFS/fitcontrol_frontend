@@ -1,4 +1,3 @@
-//RoutineForm.tsx
 "use client";
 
 import {
@@ -18,8 +17,8 @@ import {
 } from "@/types";
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import { supabase } from "@/lib/supabase"; // Corregido: el cliente debe estar en un archivo separado, ej: lib/supabaseClient.ts
 import { routineService } from "@/services/RoutineService";
+import Swal from "sweetalert2";
 
 // --- TIPOS ---
 type FormValues = {
@@ -35,7 +34,6 @@ interface RoutineFormProps {
   rutinaExistente: Rutina | null;
 }
 
-// Props para los sub-componentes para un tipado más estricto
 interface EjerciciosFieldArrayProps {
   diaIndex: number;
   control: any;
@@ -80,8 +78,6 @@ export default function RoutineForm({
   }>({ musculos: [], ejercicioMusculo: [] });
   const [isLoadingLookups, setIsLoadingLookups] = useState(true);
 
-  // --- CORRECCIÓN 1 ---
-  // Extraemos 'setValue' del hook useForm.
   const { register, control, handleSubmit, reset, setValue } =
     useForm<FormValues>({
       defaultValues: { nombre_rutina: "", dias: [] },
@@ -117,10 +113,8 @@ export default function RoutineForm({
       const formValues = {
         nombre_rutina: rutinaExistente.nombre_rutina,
         dias: rutinaExistente.dias.map((dia: RutinaDia) => ({
-          // <-- CORRECCIÓN DE TIPO
           dia_semana: dia.dia_semana,
           ejercicios: dia.ejercicios.map((ej: RutinaDiaEjercicio) => {
-            // <-- CORRECCIÓN DE TIPO
             const relacion = lookups.ejercicioMusculo.find(
               (em: any) => em.id_ejercicio === ej.ejercicio?.id_ejercicio
             );
@@ -147,93 +141,58 @@ export default function RoutineForm({
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+      const payload = {
+        nombre_rutina: data.nombre_rutina,
+        id_usuario: userId,
+        dias: data.dias.map((dia) => ({
+          dia_semana: dia.dia_semana,
+          ejercicios: dia.ejercicios
+            .filter((ej) => ej.id_ejercicio) // Ensure exercise is selected
+            .map((ej) => ({
+              id_ejercicio: ej.id_ejercicio,
+              series: ej.series,
+              repeticiones: ej.repeticiones,
+              peso_ejercicio: ej.peso_ejercicio || null,
+            })),
+        })),
+      };
+
+      let response;
       if (rutinaExistente) {
-        const { id_rutina } = rutinaExistente;
-        const { error: updateError } = await supabase
-          .from("rutina")
-          .update({ nombre_rutina: data.nombre_rutina })
-          .eq("id_rutina", id_rutina);
-        if (updateError) throw updateError;
-        const { error: deleteError } = await supabase
-          .from("rutina_dia_semana")
-          .delete()
-          .eq("id_rutina", id_rutina);
-        if (deleteError) throw deleteError;
-        for (const dia of data.dias) {
-          const { data: nuevoDia, error: diaError } = await supabase
-            .from("rutina_dia_semana")
-            .insert({ id_rutina: id_rutina, dia_semana: dia.dia_semana })
-            .select("id_rutina_dia_semana")
-            .single();
-          if (diaError) throw diaError;
-          if (dia.ejercicios && dia.ejercicios.length > 0) {
-            const ejerciciosParaInsertar = dia.ejercicios
-              .filter((ej: RutinaDiaEjercicio) => ej.id_ejercicio) // <-- CORRECCIÓN DE TIPO
-              .map((ej: RutinaDiaEjercicio) => ({
-                // <-- CORRECCIÓN DE TIPO
-                id_rutina_dia_semana: nuevoDia!.id_rutina_dia_semana,
-                id_ejercicio: ej.id_ejercicio,
-                series: ej.series,
-                repeticiones: ej.repeticiones,
-                peso_ejercicio: ej.peso_ejercicio || null,
-              }));
-            if (ejerciciosParaInsertar.length > 0) {
-              const { error: ejError } = await supabase
-                .from("rutina_dia_semana_ejercicio")
-                .insert(ejerciciosParaInsertar);
-              if (ejError) throw ejError;
-            }
-          }
-        }
+        response = await routineService.updateRutinaCompleta(
+          rutinaExistente.id_rutina,
+          payload
+        );
       } else {
-        const { data: nuevaRutina, error: rutinaError } = await supabase
-          .from("rutina")
-          .insert({ nombre_rutina: data.nombre_rutina, id_usuario: userId })
-          .select("id_rutina")
-          .single();
-        if (rutinaError) throw rutinaError;
-        const id_rutina = nuevaRutina!.id_rutina;
-        for (const dia of data.dias) {
-          const { data: nuevoDia, error: diaError } = await supabase
-            .from("rutina_dia_semana")
-            .insert({ id_rutina: id_rutina, dia_semana: dia.dia_semana })
-            .select("id_rutina_dia_semana")
-            .single();
-          if (diaError) throw diaError;
-          if (dia.ejercicios && dia.ejercicios.length > 0) {
-            const ejerciciosParaInsertar = dia.ejercicios
-              .filter((ej: RutinaDiaEjercicio) => ej.id_ejercicio) // <-- CORRECCIÓN DE TIPO
-              .map((ej: RutinaDiaEjercicio) => ({
-                // <-- CORRECCIÓN DE TIPO
-                id_rutina_dia_semana: nuevoDia!.id_rutina_dia_semana,
-                id_ejercicio: ej.id_ejercicio,
-                series: ej.series,
-                repeticiones: ej.repeticiones,
-                peso_ejercicio: ej.peso_ejercicio || null,
-              }));
-            if (ejerciciosParaInsertar.length > 0) {
-              const { error: ejError } = await supabase
-                .from("rutina_dia_semana_ejercicio")
-                .insert(ejerciciosParaInsertar);
-              if (ejError) throw ejError;
-            }
-          }
-        }
+        response = await routineService.createRutina(payload);
       }
-      alert(
-        `Rutina ${rutinaExistente ? "actualizada" : "creada"} exitosamente!`
-      );
-      onSuccess();
+
+      if (response.success) {
+        Swal.fire(
+          "¡Éxito!",
+          `Rutina ${rutinaExistente ? "actualizada" : "creada"} exitosamente!`,
+          "success"
+        );
+        onSuccess();
+      } else {
+        throw new Error(response.error);
+      }
     } catch (error: any) {
-      console.error("Error de Supabase:", error);
-      alert(`Error: ${error.message}`);
+      console.error("Error al guardar la rutina:", error);
+      Swal.fire(
+        "Error",
+        `No se pudo guardar la rutina: ${error.message}`,
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className={`modal-overlay ${isOpen ? "open" : ""}`} onClick={onClose}>
+    <div className="modal-overlay open" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{rutinaExistente ? "Editar Rutina" : "Crear Nueva Rutina"}</h2>
@@ -280,7 +239,7 @@ export default function RoutineForm({
                   control={control}
                   register={register}
                   gruposMusculares={gruposMusculares}
-                  setValue={setValue} // <-- CORRECCIÓN 2: Pasamos 'setValue' como prop.
+                  setValue={setValue}
                 />
               </div>
             ))}
@@ -306,7 +265,7 @@ export default function RoutineForm({
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoadingLookups}
             >
               {isSubmitting ? "Guardando..." : "Guardar Rutina"}
             </button>
@@ -317,7 +276,6 @@ export default function RoutineForm({
   );
 }
 
-// --- SUB-COMPONENTE PARA LA LISTA DE EJERCICIOS ---
 function EjerciciosFieldArray({
   diaIndex,
   control,
@@ -342,7 +300,7 @@ function EjerciciosFieldArray({
           register={register}
           gruposMusculares={gruposMusculares}
           onRemove={() => remove(ejIndex)}
-          setValue={setValue} // <-- La prop se pasa correctamente.
+          setValue={setValue}
         />
       ))}
       <button
@@ -356,7 +314,6 @@ function EjerciciosFieldArray({
   );
 }
 
-// --- SUB-COMPONENTE PARA UNA FILA DE EJERCICIO ---
 function EjercicioRow({
   diaIndex,
   ejIndex,
@@ -380,7 +337,6 @@ function EjercicioRow({
     name: `dias.${diaIndex}.ejercicios.${ejIndex}.musculoId`,
   });
 
-  // Los useEffect para buscar datos se quedan igual, son correctos.
   useEffect(() => {
     if (!grupoSeleccionadoId) {
       setMusculos([]);
@@ -433,7 +389,6 @@ function EjercicioRow({
               onChange={(e) => {
                 const val = e.target.value ? Number(e.target.value) : null;
                 onChange(val);
-                // --- CAMBIO: Usamos null en lugar de "" ---
                 setValue(
                   `dias.${diaIndex}.ejercicios.${ejIndex}.musculoId`,
                   null
@@ -448,7 +403,7 @@ function EjercicioRow({
               ref={ref}
             >
               <option value="">Seleccionar...</option>
-              {gruposMusculares.map((g: GrupoMuscular) => (
+              {gruposMusculares.map((g) => (
                 <option key={g.id_grupo} value={g.id_grupo}>
                   {g.nombre_grupo}
                 </option>
@@ -457,7 +412,6 @@ function EjercicioRow({
           )}
         />
       </div>
-
       <div className="form-group">
         {ejIndex === 0 && <label>Músculo</label>}
         <Controller
@@ -468,7 +422,6 @@ function EjercicioRow({
               onChange={(e) => {
                 const val = e.target.value ? Number(e.target.value) : null;
                 onChange(val);
-                // --- CAMBIO: Usamos null en lugar de "" ---
                 setValue(
                   `dias.${diaIndex}.ejercicios.${ejIndex}.id_ejercicio`,
                   null
@@ -482,7 +435,7 @@ function EjercicioRow({
               <option value="">
                 {loadingMusculos ? "Cargando..." : "Seleccionar..."}
               </option>
-              {musculos.map((m: Musculo) => (
+              {musculos.map((m) => (
                 <option key={m.id_musculo} value={m.id_musculo}>
                   {m.nombre_musculo}
                 </option>
@@ -491,7 +444,6 @@ function EjercicioRow({
           )}
         />
       </div>
-
       <div className="form-group">
         {ejIndex === 0 && <label>Ejercicio</label>}
         <Controller
@@ -511,7 +463,7 @@ function EjercicioRow({
               <option value="">
                 {loadingEjercicios ? "Cargando..." : "Seleccionar..."}
               </option>
-              {ejercicios.map((e: Ejercicio) => (
+              {ejercicios.map((e) => (
                 <option key={e.id_ejercicio} value={e.id_ejercicio}>
                   {e.nombre_ejercicio}
                 </option>
@@ -520,8 +472,6 @@ function EjercicioRow({
           )}
         />
       </div>
-
-      {/* Los inputs de número se quedan igual */}
       <div className="form-group">
         {ejIndex === 0 && <label>Series</label>}
         <input
