@@ -93,8 +93,8 @@ html.dark {
 }
 
 .btn-secondary {
-  background-color: var(--border-color);
-  color: var(--text-primary-color);
+  background-color: var(--accent-color);
+  color: var(--accent-color-text);
 }
 .btn-secondary:hover:not(:disabled) {
   background-color: #555;
