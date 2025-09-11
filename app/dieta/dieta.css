@@ -595,4 +595,8 @@ day-column-header {
   .streak-days {
     font-size: 2.4rem;
   }
+
+  .modal-content {
+    padding: 0px;
+  }
 }
