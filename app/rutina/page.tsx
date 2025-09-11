@@ -7,6 +7,7 @@ import RoutineCard from "@/components/RoutineCard";
 import RoutineForm from "@/components/RoutineForm";
 import Swal from "sweetalert2";
 import "./rutina.css";
+import { useTheme } from "@/components/ThemeContext";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -29,6 +30,8 @@ export default function RutinasPage() {
   const [rutinaActiva, setRutinaActiva] = useState<Rutina | null>(null);
   const [racha, setRacha] = useState(0);
   const [calendario, setCalendario] = useState<any[]>([]);
+
+  const { darkMode } = useTheme();
 
   const fetchRutinasCompletas = useCallback(async (id: string) => {
     setLoading(true);
@@ -69,8 +72,22 @@ export default function RutinasPage() {
   }, [userId, fetchRutinasCompletas]);
 
   const handleOpenModalParaCrear = () => {
-    setRutinaParaEditar(null);
-    setIsModalOpen(true);
+    // Si el array de rutinas ya tiene al menos un elemento
+    if (rutinas.length > 0) {
+      const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
+      Swal.fire({
+        ...swalTheme,
+        icon: "info",
+        title: "Ya tienes una rutina",
+        text: "No puedes agregar una nueva rutina porque ya tienes una establecida. Te recomiendo editar la existente para ajustarla a tus necesidades :)",
+        confirmButtonColor: "#ffe70e",
+        confirmButtonText: "Entendido",
+      });
+    } else {
+      // Si no hay rutinas, abre el modal como antes
+      setRutinaParaEditar(null);
+      setIsModalOpen(true);
+    }
   };
 
   const handleOpenModalParaEditar = (rutina: Rutina) => {

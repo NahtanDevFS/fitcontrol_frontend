@@ -323,6 +323,21 @@ function DailyDietTracker({
     );
   }
 
+  // 1. Primero, verificamos si el día ya está cumplido.
+  //    Si es así, mostramos el mensaje de éxito y terminamos.
+  if (diaCumplido) {
+    return (
+      <div className="tracker-container">
+        <h3>Cumplimiento de Hoy: {nombreDiaHoy}</h3>
+        <div className="tracker-cumplido">
+          <p>🎉 ¡Dieta del día completada! ¡Sigue así! 🎉</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Si no está cumplido, AHORA SÍ verificamos si hay comidas.
+  //    Si no hay, es un día de descanso o "cheat day".
   if (comidasDeHoy.length === 0) {
     return (
       <div className="tracker-container">
@@ -332,46 +347,39 @@ function DailyDietTracker({
     );
   }
 
+  // 3. Si no está cumplido y sí hay comidas, mostramos la lista.
   const allMealsChecked = comidasDeHoy.every((c) => c.cumplido);
 
   return (
     <div className="tracker-container">
       <h3>Cumplimiento de Hoy: {nombreDiaHoy}</h3>
-      {diaCumplido ? (
-        <div className="tracker-cumplido">
-          <p>✅ ¡Dieta del día completada! ¡Sigue así! ✅</p>
-        </div>
-      ) : (
-        <>
-          <ul className="meal-checklist">
-            {comidasDeHoy.map((comida) => (
-              <li
-                key={comida.id_dieta_alimento}
-                className={comida.cumplido ? "completado" : ""}
-              >
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={comida.cumplido}
-                    // --- CORRECCIÓN AQUÍ ---
-                    // Pasamos el objeto 'comida' completo en lugar de solo su ID.
-                    onChange={(e) => handleCheckMeal(comida, e.target.checked)}
-                  />
-                  <span className="meal-name">{comida.tiempo_comida}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-          <button
-            className="btn btn-primary"
-            onClick={handleMarkDayComplete}
-            disabled={!allMealsChecked}
-            style={{ width: "100%", marginTop: "20px" }}
-          >
-            Marcar Día como Cumplido
-          </button>
-        </>
-      )}
+      <>
+        <ul className="meal-checklist">
+          {comidasDeHoy.map((comida) => (
+            <li
+              key={comida.id_dieta_alimento}
+              className={comida.cumplido ? "completado" : ""}
+            >
+              <label>
+                <input
+                  type="checkbox"
+                  checked={comida.cumplido}
+                  onChange={(e) => handleCheckMeal(comida, e.target.checked)}
+                />
+                <span className="meal-name">{comida.tiempo_comida}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+        <button
+          className="btn btn-primary"
+          onClick={handleMarkDayComplete}
+          disabled={!allMealsChecked}
+          style={{ width: "100%", marginTop: "20px" }}
+        >
+          Marcar Día como Cumplido
+        </button>
+      </>
     </div>
   );
 }

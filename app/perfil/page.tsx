@@ -3,12 +3,6 @@
 
 import { useState, useEffect } from "react";
 //import { supabase } from "@/lib/supabase";
-import {
-  CumplimientoDietaDia,
-  CumplimientoRutina,
-  Dieta,
-  Rutina,
-} from "@/types"; // Asegúrate de tener estos tipos
 import "./perfil.css"; // Crearemos este archivo de estilos
 import { useTheme } from "@/components/ThemeContext";
 import Swal from "sweetalert2";
@@ -21,15 +15,6 @@ interface UserInfo {
   nombre: string;
   email: string;
 }
-
-// interface ProfileData {
-//   nombre_usuario: string;
-//   correo_usuario: string;
-//   peso_actual: number | null;
-//   racha_rutina: number;
-//   racha_dieta: number;
-//   unidad_peso: "kg" | "lbs";
-// }
 
 // --- COMPONENTE PRINCIPAL ---
 export default function PerfilPage() {
