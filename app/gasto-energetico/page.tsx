@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import "./gasto-energetico.css";
 import { GastoEnergeticoData } from "@/types";
 import { energyExpenditureService } from "@/services/EnergyExpenditureService";
+import { profileService } from "@/services/ProfileService";
 
 // --- TIPOS ---
 interface UserInfo {
@@ -47,13 +48,19 @@ export default function GastoEnergeticoPage() {
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
 
-      // --- LLAMADA A LA API PARA OBTENER DATOS ---
-      const response = await energyExpenditureService.getGastoEnergetico(
-        userData.id
-      );
+      // --- 2. OBTENEMOS AMBOS DATOS AL MISMO TIEMPO ---
+      const [gastoResponse, profileResponse] = await Promise.all([
+        energyExpenditureService.getGastoEnergetico(userData.id),
+        profileService.getProfileData(userData.id),
+      ]);
 
-      if (response.success && response.data) {
-        setDatosGuardados(response.data);
+      // --- 3. ACTUALIZAMOS LA UNIDAD DE PESO SEGÚN EL PERFIL ---
+      if (profileResponse.success && profileResponse.data) {
+        setUnidadPeso(profileResponse.data.unidad_peso);
+      }
+
+      if (gastoResponse.success && gastoResponse.data) {
+        setDatosGuardados(gastoResponse.data);
         setShowForm(false);
       } else {
         setShowForm(true);
@@ -126,8 +133,8 @@ function CalculationForm({
   const [peso, setPeso] = useState(() => {
     if (!initialData) return "";
     return unidadPeso === "lbs"
-      ? (initialData.peso_kg * KG_TO_LBS).toFixed(1)
-      : initialData.peso_kg;
+      ? (initialData.peso_kg * KG_TO_LBS).toFixed(2)
+      : initialData.peso_kg.toFixed(2);
   });
   const [actividad, setActividad] = useState(
     initialData?.nivel_actividad || 1.2
@@ -169,7 +176,7 @@ function CalculationForm({
         peso_ideal_kg = 45.5 + 2.3 * ((nAltura - 152.4) / 2.54);
       }
     }
-    peso_ideal_kg = Math.round(peso_ideal_kg);
+    peso_ideal_kg = Math.round(peso_ideal_kg * 100) / 100;
 
     // --- GUARDAR EN SUPABASE (siempre en kg) ---
     const dataToUpsert = {
@@ -297,11 +304,13 @@ function ResultsDisplay({
 }) {
   // Convertimos los pesos para mostrarlos en la unidad correcta
   const pesoActualMostrado =
-    unidadPeso === "lbs" ? (data.peso_kg * KG_TO_LBS).toFixed(1) : data.peso_kg;
+    unidadPeso === "lbs"
+      ? (data.peso_kg * KG_TO_LBS).toFixed(2)
+      : data.peso_kg.toFixed(2);
   const pesoIdealMostrado =
     unidadPeso === "lbs"
-      ? (data.peso_ideal_kg * KG_TO_LBS).toFixed(1)
-      : data.peso_ideal_kg;
+      ? (data.peso_ideal_kg * KG_TO_LBS).toFixed(2)
+      : data.peso_ideal_kg.toFixed(2);
 
   return (
     <div className="results-container">
