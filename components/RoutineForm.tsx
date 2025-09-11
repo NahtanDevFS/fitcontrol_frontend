@@ -371,16 +371,9 @@ function EjercicioRow({
   }, [musculoSeleccionadoId]);
 
   return (
-    <div
-      className="exercise-row"
-      style={{
-        gridTemplateColumns: "3fr 3fr 3fr 1fr 1fr 1fr 1fr",
-        alignItems: "flex-end",
-        marginBottom: "15px",
-      }}
-    >
+    <div className="exercise-row">
       <div className="form-group">
-        {ejIndex === 0 && <label>Grupo Muscular</label>}
+        <label>Grupo Muscular</label>
         <Controller
           control={control}
           name={`dias.${diaIndex}.ejercicios.${ejIndex}.grupoId`}
@@ -413,7 +406,7 @@ function EjercicioRow({
         />
       </div>
       <div className="form-group">
-        {ejIndex === 0 && <label>Músculo</label>}
+        <label>Músculo</label>
         <Controller
           control={control}
           name={`dias.${diaIndex}.ejercicios.${ejIndex}.musculoId`}
@@ -445,7 +438,7 @@ function EjercicioRow({
         />
       </div>
       <div className="form-group">
-        {ejIndex === 0 && <label>Ejercicio</label>}
+        <label>Ejercicio</label>
         <Controller
           control={control}
           name={`dias.${diaIndex}.ejercicios.${ejIndex}.id_ejercicio`}
@@ -473,7 +466,7 @@ function EjercicioRow({
         />
       </div>
       <div className="form-group">
-        {ejIndex === 0 && <label>Series</label>}
+        <label>Series</label>
         <input
           type="number"
           {...register(`dias.${diaIndex}.ejercicios.${ejIndex}.series`, {
@@ -483,7 +476,7 @@ function EjercicioRow({
         />
       </div>
       <div className="form-group">
-        {ejIndex === 0 && <label>Reps</label>}
+        <label>Reps</label>
         <input
           type="number"
           {...register(`dias.${diaIndex}.ejercicios.${ejIndex}.repeticiones`, {
@@ -493,7 +486,7 @@ function EjercicioRow({
         />
       </div>
       <div className="form-group">
-        {ejIndex === 0 && <label>Peso</label>}
+        <label>Peso</label>
         <input
           type="number"
           step="0.01"

@@ -499,17 +499,13 @@ html.dark {
 /* Estilos para pantallas de 400px o menos */
 @media (max-width: 400px) {
   .rutinas-container {
-    padding: 10px; /* Menos padding en los bordes */
+    padding: 0px; /* Menos padding en los bordes */
   }
 
   .page-header {
     flex-direction: column; /* Apila el título y el botón */
     gap: 15px;
     align-items: stretch; /* Estira el botón al 100% */
-  }
-
-  .page-header h1 {
-    font-size: 2rem; /* Título más pequeño */
   }
 
   .rutinas-grid {
@@ -530,5 +526,57 @@ html.dark {
   .exercise-details {
     min-width: 100px; /* Hacemos más pequeña esta sección */
     text-align: right;
+  }
+}
+
+.exercise-row {
+  display: grid;
+  /* Se define el layout para escritorio, similar al que estaba en línea */
+  grid-template-columns: 3fr 3fr 3fr 1fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+/* En escritorio, ocultamos las etiquetas de las filas que no sean la primera */
+.day-block .exercise-row:not(:first-of-type) .form-group label {
+  display: none;
+}
+
+/* === MEDIA QUERY PARA TABLETS Y MÓVILES === */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem; /* Título más pequeño */
+  }
+  .modal-content {
+    padding: 20px; /* Reducimos el padding del modal */
+  }
+
+  .exercise-row {
+    /* Cambiamos el grid a una sola columna (layout vertical) */
+    grid-template-columns: 1fr;
+    gap: 15px; /* Espacio entre los elementos apilados */
+    margin-bottom: 25px; /* Más espacio entre cada fila de ejercicio */
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .exercise-row:last-child {
+    border-bottom: none;
+    margin-bottom: 15px;
+  }
+
+  .exercise-row .form-group {
+    margin-bottom: 0;
+  }
+
+  /* En móvil, nos aseguramos de que TODAS las etiquetas sean visibles */
+  .day-block .exercise-row:not(:first-of-type) .form-group label {
+    display: block;
+  }
+
+  .exercise-row label {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
   }
 }
