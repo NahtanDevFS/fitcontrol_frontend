@@ -244,8 +244,8 @@ function ProgressTracker({
   const pesoActualKg = progreso.peso_actual;
   const pesoActualInicial =
     unidadPeso === "lbs"
-      ? (pesoActualKg * KG_TO_LBS).toFixed(1)
-      : pesoActualKg.toString();
+      ? (pesoActualKg * KG_TO_LBS).toFixed(2)
+      : pesoActualKg.toFixed(2);
 
   const [nuevoPeso, setNuevoPeso] = useState(pesoActualInicial);
   const [loading, setLoading] = useState(false);
@@ -254,11 +254,17 @@ function ProgressTracker({
 
   // Lógica de conversión para mostrar los datos
   const pesoInicialMostrado =
-    unidadPeso === "lbs" ? (peso_inicial * KG_TO_LBS).toFixed(1) : peso_inicial;
+    unidadPeso === "lbs"
+      ? (peso_inicial * KG_TO_LBS).toFixed(2)
+      : peso_inicial.toFixed(2);
   const pesoActualMostrado =
-    unidadPeso === "lbs" ? (peso_actual * KG_TO_LBS).toFixed(1) : peso_actual;
+    unidadPeso === "lbs"
+      ? (peso_actual * KG_TO_LBS).toFixed(2)
+      : peso_actual.toFixed(2);
   const pesoDeseadoMostrado =
-    unidadPeso === "lbs" ? (peso_deseado * KG_TO_LBS).toFixed(1) : peso_deseado;
+    unidadPeso === "lbs"
+      ? (peso_deseado * KG_TO_LBS).toFixed(2)
+      : peso_deseado.toFixed(2);
 
   const totalNecesario = Math.abs(peso_inicial - peso_deseado);
   const progresoHecho =
