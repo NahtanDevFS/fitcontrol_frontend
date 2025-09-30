@@ -18,8 +18,6 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-  //const [darkMode, setDarkMode] = useState(false);
-
   const { darkMode } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
@@ -30,13 +28,11 @@ export default function Sidebar() {
       router.push("/login");
     } else {
       console.error(result.error);
-      // Puedes mostrar un mensaje de error al usuario si lo deseas
     }
   };
 
   return (
     <>
-      {/* Sidebar para desktop */}
       <aside className={`sidebar ${darkMode ? "dark" : "light"}`}>
         <div className="sidebar-header">
           <span className="logo">FitControl</span>
@@ -65,7 +61,7 @@ export default function Sidebar() {
   );
 }
 
-// Componente para móviles
+//Componente para teléfonos
 export function SidebarMobile() {
   const [open, setOpen] = useState(false);
   const { darkMode } = useTheme();
@@ -76,7 +72,7 @@ export function SidebarMobile() {
   const handleLogout = async () => {
     const result = await authService.logout();
     if (result.success) {
-      setOpen(false); // Cierra el sidebar móvil
+      setOpen(false); //Cierra el sidebar móvil
       router.push("/login");
     }
   };
@@ -86,8 +82,6 @@ export function SidebarMobile() {
       <button className="mobile-menu-button" onClick={() => setOpen(true)}>
         <Menu className="menu-icon" />
       </button>
-
-      {/* Overlay y sidebar móvil */}
       <div className={`mobile-sidebar-container ${open ? "open" : ""}`}>
         <div className="overlay" onClick={() => setOpen(false)} />
 

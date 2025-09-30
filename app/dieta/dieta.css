@@ -1,6 +1,3 @@
-/* app/dieta/dieta.css */
-
-/*DEFINICIÓN DE COLORES PARA LOS TEMAS*/
 :root {
   --background-color: #f0f2f5;
   --card-background-color: #ffffff;
@@ -27,7 +24,6 @@ html.dark {
   --modal-overlay-bg: rgba(0, 0, 0, 0.8);
 }
 
-/*ESTILOS GENERALES DE LA PÁGINA*/
 .dieta-container {
   padding: 20px;
   background-color: var(--background-color);
@@ -55,7 +51,6 @@ html.dark {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* === BOTONES GLOBALES === */
 .btn {
   padding: 10px 20px;
   border: none;
@@ -84,7 +79,6 @@ html.dark {
   cursor: not-allowed;
 }
 
-/* === SEGUIMIENTO DIARIO Y RACHA (TRACKERS) === */
 .tracker-container,
 .streak-container {
   background-color: var(--card-background-color);
@@ -119,7 +113,6 @@ html.dark {
   font-size: 1.2rem;
 }
 
-/* Checklist de Comidas */
 .meal-checklist {
   list-style: none;
   padding: 0;
@@ -166,7 +159,6 @@ html.dark {
   color: var(--text-primary-color);
 }
 
-/* Contador de Racha y Calendario */
 .streak-container {
   display: flex;
   flex-direction: column;
@@ -232,7 +224,6 @@ html.dark {
   /* No necesita estilos visuales */
 }
 
-/* Colores de estado para el calendario */
 .calendar-day.future {
   background-color: transparent;
 }
@@ -257,7 +248,6 @@ html.dark {
   border: none;
 }
 
-/* === EDITOR DE DIETA SEMANAL (GRID) === */
 .dieta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -368,7 +358,6 @@ html.dark {
   color: var(--accent-color);
 }
 
-/* === ESTILOS DEL MODAL */
 .modal-overlay {
   background-color: var(--modal-overlay-bg);
   position: fixed;
@@ -524,7 +513,7 @@ day-column-header {
 .day-column-header h3 {
   color: var(--accent-color);
   margin: 0;
-  font-size: 1.5rem; /* Ajustamos el tamaño para que encaje mejor */
+  font-size: 1.5rem;
 }
 
 .day-total-calories {
@@ -535,13 +524,11 @@ day-column-header {
   transition: color 0.3s;
 }
 
-/* Modificación para quitar el borde del h3 original */
 .day-column > h3 {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-/* === MEDIA QUERIES PARA RESPONSIVE === */
 @media (min-width: 768px) {
   .streak-container {
     flex-direction: row;

@@ -1,5 +1,3 @@
-// types/index.ts
-
 export interface Ejercicio {
   id_ejercicio: number;
   nombre_ejercicio: string;
@@ -47,11 +45,9 @@ export interface Musculo {
 export interface CumplimientoRutina {
   id_cumplimiento_rutina: number;
   id_rutina_dia_semana: number;
-  fecha_a_cumplir: string; // formato YYYY-MM-DD
+  fecha_a_cumplir: string;
   cumplido: boolean;
 }
-
-// --- NUEVOS TIPOS PARA EL MÓDULO DE DIETA ---
 
 export interface AlimentoDetalle {
   id_dieta_alimento_detalle?: number;
@@ -84,7 +80,7 @@ export interface CumplimientoDietaDia {
   id: number;
   id_usuario: string;
   id_dieta: number;
-  fecha_a_cumplir: string; // formato YYYY-MM-DD
+  fecha_a_cumplir: string; //formato YYYY-MM-DD
   dia_semana: string;
   cumplido: boolean;
 }

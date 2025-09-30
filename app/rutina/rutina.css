@@ -1,4 +1,3 @@
-/* === ESTILOS GENERALES === */
 :root {
   --background-color: #f0f2f5;
   --card-background-color: #ffffff;
@@ -16,7 +15,6 @@
   --completed-routine-color: #7ef884;
 }
 
-/* Cuando el html tiene la clase .dark, usamos los colores oscuros */
 html.dark {
   --background-color: #18191a;
   --card-background-color: #2a2a2a;
@@ -25,7 +23,7 @@ html.dark {
   --text-secondary-color: #aaa;
   --border-color: #444;
   --border-dashed-color: #555;
-  --accent-color: #ffe70e; /* Amarillo para el tema oscuro */
+  --accent-color: #ffe70e;
   --accent-color-text: #333;
   --btn-destructive-bg: #721c24;
   --btn-destructive-text: #f8d7da;
@@ -58,7 +56,6 @@ html.dark {
   font-weight: bold;
 }
 
-/* === BOTONES === */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -101,7 +98,6 @@ html.dark {
   cursor: not-allowed;
 }
 
-/* === TARJETAS DE RUTINA === */
 .rutinas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -157,7 +153,6 @@ html.dark {
   gap: 10px;
 }
 
-/* === MODAL Y FORMULARIO === */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -216,7 +211,6 @@ html.dark {
   margin-top: 30px;
 }
 
-/* === GRUPOS DE FORMULARIO === */
 .form-group {
   margin-bottom: 20px;
 }
@@ -266,7 +260,6 @@ html.dark {
   font-size: 0.8rem;
 }
 
-/* === ESTILOS PARA LA SECCIÓN DE CUMPLIMIENTO === */
 .section-title {
   font-size: 1.8rem;
   font-weight: bold;
@@ -283,7 +276,6 @@ html.dark {
   border-radius: 10px;
 }
 
-/* === ESTILOS PARA EL TRACKER DIARIO === */
 .tracker-container {
   background-color: var(--card-background-color);
   padding: 25px;
@@ -365,7 +357,6 @@ html.dark {
   font-size: 1.2rem;
 }
 
-/* === ESTILOS PARA EL CONTADOR DE RACHA Y CALENDARIO (CORREGIDO Y RESPONSIVE) === */
 .streak-container {
   display: flex;
   flex-direction: column;
@@ -436,7 +427,6 @@ html.dark {
   /* No necesita estilos */
 }
 
-/* Colores de estado para el calendario */
 .calendar-day.future {
   background-color: transparent;
 }
@@ -461,7 +451,6 @@ html.dark {
   border: none;
 }
 
-/* Media Query para tablets y pantallas medianas */
 @media (min-width: 768px) {
   .streak-container {
     flex-direction: row;
@@ -477,79 +466,72 @@ html.dark {
   }
 }
 
-/* --- NUEVA MEDIA QUERY PARA PC --- */
-/* Estilos para pantallas grandes (desktops) */
 @media (min-width: 1024px) {
   .calendar-grid {
-    gap: 10px; /* Aumentamos el espacio entre los días */
+    gap: 10px;
   }
 
   .calendar-day {
-    height: 50px; /* Hacemos los círculos más grandes */
+    height: 50px;
     width: 50px;
-    font-size: 1rem; /* Aumentamos el tamaño del número */
+    font-size: 1rem;
   }
 
   .streak-days {
-    font-size: 3.5rem; /* Hacemos el contador de racha un poco más grande también */
+    font-size: 3.5rem;
   }
 }
 
-/*SECCIÓN RESPONSIVE*/
-/* Estilos para pantallas de 400px o menos */
 @media (max-width: 400px) {
   .rutinas-container {
-    padding: 0px; /* Menos padding en los bordes */
+    padding: 0px;
   }
 
   .page-header {
-    flex-direction: column; /* Apila el título y el botón */
+    flex-direction: column;
     gap: 15px;
-    align-items: stretch; /* Estira el botón al 100% */
+    align-items: stretch;
   }
 
   .rutinas-grid {
-    grid-template-columns: 1fr; /* Una sola columna para las tarjetas */
+    grid-template-columns: 1fr;
     gap: 15px;
   }
 
   .tracker-container,
   .streak-container {
-    padding: 15px; /* Menos padding en los trackers */
+    padding: 15px;
   }
 
   .tracker-container h3,
   .streak-counter h3 {
-    font-size: 1.3rem; /* Títulos más pequeños */
+    font-size: 1.3rem;
   }
 
   .exercise-details {
-    min-width: 100px; /* Hacemos más pequeña esta sección */
+    min-width: 100px;
     text-align: right;
   }
 }
 
 .exercise-row {
   display: grid;
-  /* Se define el layout para escritorio, similar al que estaba en línea */
   grid-template-columns: 3fr 3fr 3fr 1fr 1fr 1fr auto;
   gap: 10px;
   align-items: flex-end;
   margin-bottom: 10px;
 }
 
-/* En escritorio, ocultamos las etiquetas de las filas que no sean la primera */
 .day-block .exercise-row:not(:first-of-type) .form-group label {
   display: none;
 }
 
-/* === MEDIA QUERY PARA TABLETS Y MÓVILES === */
 @media (max-width: 768px) {
   .page-header h1 {
-    font-size: 2rem; /* Título más pequeño */
+    font-size: 2rem;
   }
   .modal-content {
-    padding: 20px; /* Reducimos el padding del modal */
+    padding: 20px;
   }
 
   .exercise-row {

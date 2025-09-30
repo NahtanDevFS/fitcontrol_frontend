@@ -1,5 +1,3 @@
-/* app/perfil/perfil.css */
-
 :root {
   --background-color: #f0f2f5;
   --card-background-color: #ffffff;
@@ -32,7 +30,6 @@ html.dark {
   margin: 0 auto;
 }
 
-/* Reutilizamos estilos globales que ya tienes */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -47,12 +44,11 @@ html.dark {
   font-weight: bold;
 }
 
-/* Estilos específicos del perfil */
 .profile-card {
   background-color: var(--card-background-color);
   border-radius: 10px;
   border: 1px solid var(--border-color);
-  overflow: hidden; /* Para que los bordes redondeados se apliquen bien */
+  overflow: hidden;
 }
 
 .profile-info {
@@ -135,7 +131,6 @@ html.dark {
   cursor: pointer;
 }
 
-/* Sección de estadísticas */
 .profile-stats {
   background-color: var(--card-secondary-bg-color);
   border-top: 1px solid var(--border-color);
@@ -169,7 +164,7 @@ html.dark {
   border-radius: 8px;
   border: 1px solid var(--border-color);
   overflow: hidden;
-  width: fit-content; /* Se ajusta al contenido */
+  width: fit-content;
 }
 
 .unit-toggle button {
@@ -207,24 +202,22 @@ html.dark {
   border: none !important;
 }
 
-/* NUEVA SECCIÓN RESPONSIVE */
-/* Estilos para pantallas de 400px o menos */
 @media (max-width: 400px) {
   .profile-container {
-    padding: 15px; /* Menos padding general */
+    padding: 15px;
   }
 
   .page-header h1 {
-    font-size: 2rem; /* Título más pequeño */
+    font-size: 2rem;
   }
 
   .profile-info {
-    padding: 20px; /* Menos padding en la tarjeta */
+    padding: 20px;
   }
 
   .edit-form {
-    flex-direction: column; /* Apila el input y los botones */
-    align-items: stretch; /* Estira los elementos al 100% */
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .edit-form input {
@@ -233,16 +226,15 @@ html.dark {
 
   .profile-stats {
     padding: 20px;
-    /* Forzamos 2 columnas para que no quede una estadística sola */
     grid-template-columns: 1fr 1fr;
   }
 
   .stat-value {
-    font-size: 1.5rem; /* Hacemos las estadísticas más pequeñas */
+    font-size: 1.5rem;
   }
 
   .unit-toggle {
-    width: 100%; /* El selector ocupa todo el ancho */
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
   }

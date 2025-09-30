@@ -15,7 +15,7 @@ if (!API_BASE_URL) {
     "La variable NEXT_PUBLIC_API_URL_BACKEND no está definida en el entorno."
   );
 }
-// Función genérica para manejar las peticiones fetch
+//Función genérica para manejar las peticiones fetch
 async function request<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -25,8 +25,6 @@ async function request<T>(
       ...options,
       headers: {
         "Content-Type": "application/json",
-        // Aquí podrías agregar el token de autorización si lo necesitas
-        // 'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         ...options.headers,
       },
     });
@@ -38,14 +36,14 @@ async function request<T>(
       throw new Error(errorData.error || "Error en la solicitud");
     }
 
-    // Si la respuesta no tiene contenido (ej. en un DELETE exitoso)
+    //Si la respuesta no tiene contenido como un delete exitoso
     if (response.status === 204) {
       return { success: true };
     }
 
     const data = await response.json();
-    // Revisa si la respuesta del backend ya viene envuelta en un objeto { data: ... }
-    // Si no, asume que la respuesta completa es la data.
+    //Revisa si la respuesta del backend ya viene envuelta en un objeto
+    //Si no, asume que la respuesta completa es la data
     const payload = data.data !== undefined ? data.data : data;
 
     return { success: true, data: payload };
@@ -82,11 +80,11 @@ export const authService = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include", // Importante para manejar cookies de sesión
+        credentials: "include", //Importante para manejar cookies de sesión
       });
 
       if (!response.ok) {
-        // Si hay un error en la respuesta
+        //Si hay un error en la respuesta
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const errorData = await response.json();
@@ -101,7 +99,7 @@ export const authService = {
 
       const data = await response.json();
 
-      // Guardar token en cookies y localStorage
+      //Guardar token en cookies y localStorage
       document.cookie = `authToken=${data.session.access_token}; path=/; max-age=86400; SameSite=Lax`;
       localStorage.setItem("authToken", data.session.access_token);
       localStorage.setItem("userFitControl", JSON.stringify(data.user));
@@ -144,14 +142,14 @@ export const authService = {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: "POST",
-        credentials: "include", // Importante para limpiar cookies
+        credentials: "include", //Importante para limpiar cookies
       });
 
       if (!response.ok) {
         throw new Error("Error al cerrar sesión");
       }
 
-      // Limpiar el token del cliente
+      //Limpiar el token del cliente
       localStorage.removeItem("authToken");
       localStorage.removeItem("userFitControl");
       document.cookie =

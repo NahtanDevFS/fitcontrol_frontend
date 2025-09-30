@@ -1,13 +1,10 @@
-// services/routineService.ts
-
 import { api } from "@/lib/api";
 import { Rutina, RutinaDia } from "@/types";
 
-// Tipos simplificados para la data que se envía.
-// Puedes ajustarlos a tus 'types' si lo necesitas.
+//Tipos simplificados para la data que se envía.
 interface RutinaData {
   nombre_rutina: string;
-  id_usuario?: string; // Opcional, ya que no se usa en la actualización
+  id_usuario?: string;
   dias: any[];
 }
 
@@ -24,18 +21,16 @@ interface RutinaCompletaResponse {
   calendario: any[];
 }
 
-// Payload para crear o actualizar una rutina completa
+//Payload para crear o actualizar una rutina completa
 interface RoutinePayload {
   nombre_rutina: string;
   id_usuario: string;
-  dias: any[]; // Se usa 'any' para flexibilidad en el formulario
+  dias: any[]; //Se usa 'any' para flexibilidad en el formulario
 }
 
 export const routineService = {
-  /**
-   * Obtiene UNA SOLA rutina por su ID.
-   * Esta es la función clave para tu formulario de "Editar".
-   */
+  //Obtiene UNA SOLA rutina por su ID.
+  //Esta es la función clave para tu formulario de "Editar".
   getRutinaById: (rutinaId: number | string) => {
     return api.get<Rutina>(`/rutina/${rutinaId}`);
   },

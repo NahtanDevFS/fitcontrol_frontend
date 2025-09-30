@@ -1,8 +1,6 @@
-// app/dashboard/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-//import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import {
   CumplimientoDietaDia,
@@ -12,25 +10,13 @@ import {
 import "./dashboard.css";
 import { dashboardService } from "@/services/DashboardService";
 
-// --- TIPOS ---
 interface UserInfo {
   id: string;
   nombre: string;
 }
 
-// --- CAMBIO 1: Añadimos la unidad de peso a los datos del dashboard ---
-// interface DashboardData {
-//   nombreUsuario: string;
-//   rachaRutina: number;
-//   rachaDieta: number;
-//   pesoActual: number | null;
-//   metaPeso: number | null;
-//   unidadPeso: "kg" | "lbs"; // <-- NUEVO CAMPO
-// }
-
 const KG_TO_LBS = 2.20462;
 
-// --- COMPONENTE PRINCIPAL DEL DASHBOARD ---
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +30,7 @@ export default function DashboardPage() {
       }
       const userData: UserInfo = JSON.parse(storedUser);
 
-      // --- ÚNICA LLAMADA A LA API ---
+      //llamada a la API
       const response = await dashboardService.getDashboardData(userData.id);
 
       if (response.success && response.data) {
@@ -69,7 +55,7 @@ export default function DashboardPage() {
     );
   }
 
-  // --- CAMBIO 3: Lógica para mostrar los pesos convertidos ---
+  //mostrar pesos convertidos
   const pesoActualMostrado =
     data?.unidadPeso === "lbs" && data.pesoActual
       ? (data.pesoActual * KG_TO_LBS).toFixed(1)
@@ -104,7 +90,6 @@ export default function DashboardPage() {
           </p>
         </DashboardCard>
 
-        {/* --- CAMBIO 4: Usamos los valores convertidos en la tarjeta --- */}
         <DashboardCard title="Mi Progreso" icon="📊" link="/metas">
           {data?.pesoActual ? (
             <p className="card-metric">
@@ -137,7 +122,7 @@ export default function DashboardPage() {
   );
 }
 
-// --- SUB-COMPONENTE REUTILIZABLE PARA LAS TARJETAS (Sin Cambios) ---
+//sub-componente reutilizable para las cards
 interface DashboardCardProps {
   title: string;
   icon: string;

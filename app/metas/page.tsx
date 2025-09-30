@@ -1,15 +1,12 @@
-// app/metas/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-//import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 import { useTheme } from "@/components/ThemeContext";
 import { progressService } from "@/services/ProgressService";
 import { Progreso } from "@/types";
 import "./metas.css";
 
-// --- TIPOS ---
 interface UserInfo {
   id: string;
 }
@@ -18,12 +15,11 @@ type UnidadPeso = "kg" | "lbs";
 
 const KG_TO_LBS = 2.20462;
 
-// --- COMPONENTE PRINCIPAL ---
 export default function MetasPage() {
   const [progresoActivo, setProgresoActivo] = useState<Progreso | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [unidadPeso, setUnidadPeso] = useState<UnidadPeso>("kg"); // Estado para la preferencia
+  const [unidadPeso, setUnidadPeso] = useState<UnidadPeso>("kg"); //Estado para la preferencia
 
   const { darkMode } = useTheme();
 
@@ -32,7 +28,6 @@ export default function MetasPage() {
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setUserId(userData.id);
-      // Llamamos a la función que ahora usa nuestro servicio
       fetchProgresoActivo(userData.id);
     } else {
       console.error(
@@ -40,7 +35,7 @@ export default function MetasPage() {
       );
       window.location.href = "/login";
     }
-  }, []); // Se ejecuta solo una vez al montar el componente
+  }, []); //Se ejecuta solo una vez al montar el componente
 
   const fetchProgresoActivo = async (id: string) => {
     setLoading(true);
@@ -101,7 +96,6 @@ export default function MetasPage() {
   );
 }
 
-// --- SUB-COMPONENTE: FORMULARIO PARA CREAR META (ACTUALIZADO) ---
 function CreateGoalForm({
   userId,
   unidadPeso,
@@ -150,11 +144,6 @@ function CreateGoalForm({
       return;
     }
 
-    // --- CONVERSIÓN CLAVE ---
-    // Nos aseguramos de enviar siempre el peso en KG al backend
-    //let pa_kg = pa;
-    //let pd_kg = pd;
-    // Si la unidad es libras, convertimos a kg antes de guardar
     if (unidadPeso === "lbs") {
       pa = pa / KG_TO_LBS;
       pd = pd / KG_TO_LBS;
@@ -162,7 +151,7 @@ function CreateGoalForm({
 
     const objetivo = pd < pa ? "bajar" : "subir";
 
-    // LLAMADA A LA API
+    //llamada a la API
     const response = await progressService.createProgreso({
       id_usuario: userId,
       peso_actual: pa,
@@ -228,7 +217,6 @@ function CreateGoalForm({
   );
 }
 
-// --- SUB-COMPONENTE: VISTA DE PROGRESO ACTUAL (ACTUALIZADO) ---
 function ProgressTracker({
   progreso,
   unidadPeso,
@@ -240,7 +228,7 @@ function ProgressTracker({
   onMetaCambiada: () => void;
   darkMode: boolean;
 }) {
-  // Convertimos el peso de la BD a la unidad preferida para mostrarlo
+  //Convertimos el peso de la BD a la unidad preferida para mostrarlo
   const pesoActualKg = progreso.peso_actual;
   const pesoActualInicial =
     unidadPeso === "lbs"
@@ -252,7 +240,7 @@ function ProgressTracker({
 
   const { peso_inicial, peso_actual, peso_deseado, objetivo } = progreso;
 
-  // Lógica de conversión para mostrar los datos
+  //conversión para mostrar los datos
   const pesoInicialMostrado =
     unidadPeso === "lbs"
       ? (peso_inicial * KG_TO_LBS).toFixed(2)
@@ -297,12 +285,12 @@ function ProgressTracker({
       return;
     }
 
-    // Convertimos a kg si es necesario antes de actualizar
+    //Convertimos a kg si es necesario antes de actualizar
     if (unidadPeso === "lbs") {
       pa = pa / KG_TO_LBS;
     }
 
-    // --- LLAMADA A LA API PARA ACTUALIZAR ---
+    //llamada a la API para actualizar
     const response = await progressService.updateProgreso(
       progreso.id_progreso,
       {
@@ -331,7 +319,6 @@ function ProgressTracker({
   };
 
   const handleNuevoObjetivo = async () => {
-    // Reemplazamos confirm con Swal
     const result = await Swal.fire({
       ...swalTheme,
       title: "¿Estás seguro?",
@@ -346,7 +333,6 @@ function ProgressTracker({
 
     if (result.isConfirmed) {
       setLoading(true);
-      // --- LLAMADA A LA API PARA FINALIZAR ---
       const response = await progressService.finishProgreso(
         progreso.id_progreso
       );

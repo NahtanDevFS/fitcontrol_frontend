@@ -20,7 +20,7 @@ export default function LoginPage() {
     const result = await authService.login(email, password);
 
     if (result.success && result.data?.session) {
-      // Guardar token en localStorage
+      //Guardar token en localStorage
       localStorage.setItem("authToken", result.data.session.access_token);
       router.push("/dashboard");
     } else {

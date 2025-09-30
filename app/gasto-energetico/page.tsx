@@ -1,8 +1,6 @@
-// app/gasto-energetico/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-//import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/components/ThemeContext";
 import Swal from "sweetalert2";
 import "./gasto-energetico.css";
@@ -10,7 +8,6 @@ import { GastoEnergeticoData } from "@/types";
 import { energyExpenditureService } from "@/services/EnergyExpenditureService";
 import { profileService } from "@/services/ProfileService";
 
-// --- TIPOS ---
 interface UserInfo {
   id: string;
 }
@@ -27,7 +24,6 @@ const nivelesActividad = [
 
 const KG_TO_LBS = 2.20462;
 
-// --- COMPONENTE PRINCIPAL ---
 export default function GastoEnergeticoPage() {
   const [datosGuardados, setDatosGuardados] =
     useState<GastoEnergeticoData | null>(null);
@@ -48,13 +44,13 @@ export default function GastoEnergeticoPage() {
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
 
-      // --- 2. OBTENEMOS AMBOS DATOS AL MISMO TIEMPO ---
+      //se obtiene el gasto energético y perfil
       const [gastoResponse, profileResponse] = await Promise.all([
         energyExpenditureService.getGastoEnergetico(userData.id),
         profileService.getProfileData(userData.id),
       ]);
 
-      // --- 3. ACTUALIZAMOS LA UNIDAD DE PESO SEGÚN EL PERFIL ---
+      //se actualiza la unidad según el peso del perfil
       if (profileResponse.success && profileResponse.data) {
         setUnidadPeso(profileResponse.data.unidad_peso);
       }
@@ -101,18 +97,17 @@ export default function GastoEnergeticoPage() {
         <CalculationForm
           userId={userId!}
           initialData={datosGuardados}
-          unidadPeso={unidadPeso} // Pasamos la preferencia al formulario
+          unidadPeso={unidadPeso} //Pasamos la preferencia al formulario
           onSuccess={handleSuccess}
           darkMode={darkMode}
         />
       ) : (
-        <ResultsDisplay data={datosGuardados} unidadPeso={unidadPeso} /> // Pasamos la preferencia a los resultados
+        <ResultsDisplay data={datosGuardados} unidadPeso={unidadPeso} /> //Pasamos la preferencia a los resultados
       )}
     </div>
   );
 }
 
-// --- SUB-COMPONENTE: FORMULARIO DE CÁLCULO ---
 function CalculationForm({
   userId,
   initialData,
@@ -129,7 +124,6 @@ function CalculationForm({
   const [sexo, setSexo] = useState(initialData?.sexo || "hombre");
   const [edad, setEdad] = useState(initialData?.edad || "");
   const [altura, setAltura] = useState(initialData?.altura_cm || "");
-  // El estado 'peso' ahora guarda el valor en la unidad que el usuario ve
   const [peso, setPeso] = useState(() => {
     if (!initialData) return "";
     return unidadPeso === "lbs"
@@ -151,13 +145,12 @@ function CalculationForm({
     const nAltura = Number(altura);
     let nPesoKg = Number(peso); // Asumimos que el peso está en kg por defecto
 
-    // --- CONVERSIÓN CLAVE ---
-    // Si la unidad es libras, convertimos el valor del input a kg para los cálculos
+    //Si la unidad es libras, convertimos el valor del input a kg para los cálculos
     if (unidadPeso === "lbs") {
       nPesoKg = Number(peso) / KG_TO_LBS;
     }
 
-    // --- CÁLCULOS (usan siempre kg y cm) ---
+    //los cálculos usan siempre kg y cm
     let tmb = 0;
     if (sexo === "hombre") {
       tmb = 10 * nPesoKg + 6.25 * nAltura - 5 * nEdad + 5;
@@ -178,13 +171,13 @@ function CalculationForm({
     }
     peso_ideal_kg = Math.round(peso_ideal_kg * 100) / 100;
 
-    // --- GUARDAR EN SUPABASE (siempre en kg) ---
+    //guardar en supabase en kg
     const dataToUpsert = {
       id_usuario: userId,
       sexo,
       edad: nEdad,
       altura_cm: nAltura,
-      peso_kg: nPesoKg, // Guardamos el valor en kg
+      peso_kg: nPesoKg,
       nivel_actividad: actividad,
       tmb,
       calorias_mantener,
@@ -202,7 +195,7 @@ function CalculationForm({
       nivel_actividad: Number(actividad),
     };
 
-    // --- LLAMADA A LA API PARA CALCULAR Y GUARDAR ---
+    //llamada a la API para calcular y guardar
     const response = await energyExpenditureService.upsertGastoEnergetico(
       payload
     );
@@ -261,7 +254,6 @@ function CalculationForm({
             />
           </div>
           <div className="form-group">
-            {/* El label ahora es dinámico */}
             <label htmlFor="peso">Peso ({unidadPeso})</label>
             <input
               id="peso"
@@ -294,7 +286,6 @@ function CalculationForm({
   );
 }
 
-// --- SUB-COMPONENTE: VISTA DE RESULTADOS ---
 function ResultsDisplay({
   data,
   unidadPeso,
@@ -302,7 +293,6 @@ function ResultsDisplay({
   data: GastoEnergeticoData;
   unidadPeso: UnidadPeso;
 }) {
-  // Convertimos los pesos para mostrarlos en la unidad correcta
   const pesoActualMostrado =
     unidadPeso === "lbs"
       ? (data.peso_kg * KG_TO_LBS).toFixed(2)

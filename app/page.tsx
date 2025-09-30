@@ -9,15 +9,15 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar si estamos en el cliente (navegador)
+    //Verificar si estamos en el cliente (navegador)
     if (typeof window !== "undefined") {
       const userFitControl = localStorage.getItem("userFitControl");
 
       if (!userFitControl) {
-        // Si no existe userFitControl, redirigir a /login
+        //Si no existe userFitControl, redirigir a /login
         router.push("/login");
       } else {
-        // Si existe userFitControl, redirigir a /dashboard
+        //Si existe userFitControl, redirigir a /dashboard
         router.push("/dashboard");
       }
     }

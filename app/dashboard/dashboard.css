@@ -1,7 +1,3 @@
-/* app/dashboard/dashboard.css */
-
-/* --- 1. DEFINICIÓN DE COLORES PARA LOS TEMAS --- */
-
 /* Por defecto, usamos el tema claro */
 :root {
   --background-color: #ffffff;
@@ -9,7 +5,7 @@
   --text-primary-color: #1a1a1a;
   --text-secondary-color: #65676b;
   --border-color: #e0e0e0;
-  --accent-color: #ffc70e; /* Un azul vibrante para el modo claro */
+  --accent-color: #ffc70e;
   --card-hover-shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -20,17 +16,14 @@ html.dark {
   --text-primary-color: #f3f3f3;
   --text-secondary-color: #aaa;
   --border-color: #444;
-  --accent-color: #ffe70e; /* Tu amarillo característico para el modo oscuro */
+  --accent-color: #ffe70e;
   --card-hover-shadow: rgba(0, 0, 0, 0.4);
 }
-
-/* --- 2. ESTILOS DEL DASHBOARD USANDO VARIABLES --- */
 
 .dashboard-container {
   padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
-  /* El color del contenedor y el texto ahora dependen del tema */
   background-color: var(--background-color);
   color: var(--text-primary-color);
   transition: background-color 0.3s, color 0.3s;
@@ -148,32 +141,29 @@ html.dark {
   opacity: 1;
 }
 
-/* SECCIÓN RESPONSIVE */
-/* Estilos para pantallas de 400px o menos */
 @media (max-width: 400px) {
   .dashboard-container {
-    padding: 20px; /* Reducimos el padding general */
+    padding: 20px;
   }
 
   .dashboard-header h1 {
-    font-size: 2rem; /* Hacemos el título más pequeño */
+    font-size: 2rem;
   }
 
   .dashboard-header p {
-    font-size: 1rem; /* Hacemos el subtítulo más pequeño */
+    font-size: 1rem;
   }
 
   .dashboard-grid {
-    /* Hacemos que la tarjeta ocupe más espacio disponible */
     grid-template-columns: 1fr;
-    gap: 20px; /* Reducimos el espacio entre tarjetas */
+    gap: 20px;
   }
 
   .card-content {
-    padding: 20px; /* Menos padding dentro de las tarjetas */
+    padding: 20px;
   }
 
   .card-metric {
-    font-size: 1.8rem; /* Hacemos la métrica un poco más pequeña */
+    font-size: 1.8rem;
   }
 }

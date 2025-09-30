@@ -33,7 +33,7 @@
   font-size: 1.1rem;
   color: #aaa;
   line-height: 1.6;
-  min-height: 50px; /* Para evitar que el layout salte al cambiar el texto */
+  min-height: 50px;
 }
 
 .confirmation-button {

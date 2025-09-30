@@ -8,7 +8,7 @@ import Header from "../header/Header";
 import Footer from "../footer/Footer";
 import Chatbot from "../chatbot/Chatbot";
 
-// Rutas públicas donde NO debe aparecer el sidebar
+//Rutas públicas donde no debe aparecer el sidebar
 const publicRoutes = [
   "/login",
   "/register",
@@ -27,11 +27,9 @@ export default function LayoutWrapper({
   const isPublicRoute = publicRoutes.includes(pathname);
 
   if (isPublicRoute) {
-    // Para rutas públicas (login, register, etc.) sin sidebar
     return <main>{children}</main>;
   }
 
-  // Para rutas protegidas (dashboard, dieta, etc.) con sidebar
   return (
     <div className="layout-container">
       <ThemeProvider>

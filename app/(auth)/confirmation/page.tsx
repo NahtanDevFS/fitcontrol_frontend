@@ -13,35 +13,35 @@ export default function ConfirmacionPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // onAuthStateChange es la forma más robusta de manejar eventos de autenticación.
-    // Se activa automáticamente cuando el cliente de Supabase detecta el token en la URL
-    // y completa el proceso de inicio de sesión.
+    //onAuthStateChange es la forma más robusta de manejar eventos de autenticación
+    //Se activa automáticamente cuando el cliente de Supabase detecta el token en la URL
+    //y completa el proceso de inicio de sesión.
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Nos interesa el evento 'SIGNED_IN', que se dispara tras la confirmación del correo.
+        //Nos interesa el evento 'SIGNED_IN', que se dispara tras la confirmación del correo.
         if (event === "SIGNED_IN" && session) {
           try {
-            // Actualizamos el estado en nuestra tabla 'usuario' para marcarlo como activo.
+            //Actualizamos el estado en nuestra tabla 'usuario' para marcarlo como activo.
             const { error: updateError } = await supabase
               .from("usuario")
               .update({ estado: 1 }) // 1 = activo
               .eq("id_usuario", session.user.id);
 
             if (updateError) {
-              // Si la actualización falla, lanzamos el error para que lo capture el catch.
+              //si la actualización falla, lanzamos el error para que lo capture el catch.
               throw updateError;
             }
 
-            // Si todo fue exitoso, actualizamos la UI.
+            //si todo fue exitoso, actualizamos la UI.
             setIsVerified(true);
             setMessage(
               "¡Correo verificado exitosamente! Redirigiendo a inicio de sesión..."
             );
 
-            // Programamos la redirección.
+            //Programamos la redirección.
             setTimeout(() => {
               router.push("/dashboard");
-            }, 3000); // 3 segundos de espera
+            }, 3000); //3 segundos de espera
           } catch (error) {
             console.error("Error al actualizar el estado del usuario:", error);
             setMessage(
@@ -52,7 +52,7 @@ export default function ConfirmacionPage() {
       }
     );
 
-    // Es una buena práctica limpiar el "oyente" cuando el componente se desmonta.
+    //Es una buena práctica limpiar el "oyente" cuando el componente se desmonta.
     return () => {
       authListener.subscription.unsubscribe();
     };

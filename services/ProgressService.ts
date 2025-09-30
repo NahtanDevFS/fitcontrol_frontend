@@ -1,9 +1,7 @@
-// fitcontrol_frontend/services/ProgressService.ts
-
 import { api } from "@/lib/api";
 import { Progreso } from "@/types";
 
-// Definimos un tipo para la respuesta de nuestro nuevo endpoint
+//Definimos un tipo para la respuesta de nuestro nuevo endpoint
 interface ProgresoActivoResponse {
   progreso: Progreso | null;
   unidad_peso: "kg" | "lbs";
@@ -22,36 +20,27 @@ interface UpdateProgresoPayload {
 }
 
 export const progressService = {
-  /**
-   * Obtiene el progreso activo y la unidad de peso de un usuario.
-   */
+  //Obtiene el progreso activo y la unidad de peso de un usuario.
+
   getProgresoActivo: (userId: string) => {
     return api.get<ProgresoActivoResponse>(
       `/progreso-usuario/activo/${userId}`
     );
   },
-  /**
-   * Crea un nuevo registro de progreso para un usuario.
-   * @param progresoData - Los datos para crear la nueva meta.
-   */
+
+  //Crea un nuevo registro de progreso para un usuario.
+
   createProgreso: (progresoData: CreateProgresoPayload) => {
-    // La API espera un POST en la ruta base del progreso
+    //La API espera un POST en la ruta base del progreso
     return api.post<Progreso>("/progreso-usuario", progresoData);
   },
 
-  /**
-   * Actualiza un registro de progreso existente.
-   * @param progresoId - El ID del registro de progreso a actualizar.
-   * @param updateData - Los campos a actualizar.
-   */
+  //Actualiza un registro de progreso existente.
   updateProgreso: (progresoId: number, updateData: UpdateProgresoPayload) => {
     return api.put<Progreso>(`/progreso-usuario/${progresoId}`, updateData);
   },
 
-  /**
-   * Finaliza una meta activa, cambiando su estado a 2.
-   * @param progresoId - El ID del registro de progreso a finalizar.
-   */
+  //Finaliza una meta activa, cambiando su estado a 2.
   finishProgreso: (progresoId: number) => {
     const updateData: UpdateProgresoPayload = {
       estado: 2,

@@ -42,7 +42,7 @@
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-sizing: border-box; /* Esto asegura que el padding no afecte el ancho total */
+  box-sizing: border-box;
 }
 
 button {

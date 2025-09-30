@@ -20,7 +20,6 @@ import { api } from "@/lib/api";
 import { routineService } from "@/services/RoutineService";
 import Swal from "sweetalert2";
 
-// --- TIPOS ---
 type FormValues = {
   nombre_rutina: string;
   dias: RutinaDia[];
@@ -62,7 +61,6 @@ const DIAS_SEMANA = [
   "Domingo",
 ];
 
-// --- COMPONENTE PRINCIPAL ---
 export default function RoutineForm({
   isOpen,
   onClose,
@@ -147,7 +145,7 @@ export default function RoutineForm({
         dias: data.dias.map((dia) => ({
           dia_semana: dia.dia_semana,
           ejercicios: dia.ejercicios
-            .filter((ej) => ej.id_ejercicio) // Ensure exercise is selected
+            .filter((ej) => ej.id_ejercicio) //asegura que el ejercicio esté seleccionado
             .map((ej) => ({
               id_ejercicio: ej.id_ejercicio,
               series: ej.series,

@@ -8,7 +8,6 @@ import { useTheme } from "../ThemeContext";
 import { API_ENDPOINTS } from "@/lib/api";
 
 export default function Header() {
-  //onst [darkMode, setDarkMode] = useState(false);
   const [userName, setUserName] = useState("");
 
   const { darkMode, toggleDarkMode } = useTheme();
@@ -16,7 +15,7 @@ export default function Header() {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        // Obtener el usuario del localStorage
+        //Obtener el usuario del localStorage
         const userData = localStorage.getItem("userFitControl");
 
         if (userData) {
@@ -28,11 +27,11 @@ export default function Header() {
           //     return;
           //   }
 
-          // Si no, hacemos la llamada a la API
+          //hacemos la llamada a la API
           const res = await fetch(API_ENDPOINTS.USUARIO.BASE);
           const data = await res.json();
 
-          // Verificamos si la respuesta es un array de usuarios
+          //Verificamos si la respuesta es un array de usuarios
           if (Array.isArray(data)) {
             const usuarioEncontrado = data.find(
               (usuario) => usuario.id_usuario === user.id
@@ -40,7 +39,7 @@ export default function Header() {
 
             if (usuarioEncontrado) {
               setUserName(usuarioEncontrado.nombre_usuario);
-              // Actualizar localStorage con los nuevos datos
+              //Actualizar localStorage con los nuevos datos
               localStorage.setItem(
                 "userFitControl",
                 JSON.stringify({

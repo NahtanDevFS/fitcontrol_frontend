@@ -3,7 +3,6 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /* Usamos la misma imagen de fondo que en el login para consistencia */
   background-image: url("/background2.png");
   background-size: cover;
   background-position: center;
@@ -84,7 +83,7 @@ button:hover:not(:disabled) {
 }
 
 button:disabled {
-  background-color: #fff491; /* Un amarillo más pálido */
+  background-color: #fff491;
   cursor: not-allowed;
 }
 

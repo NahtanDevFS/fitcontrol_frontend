@@ -1,9 +1,7 @@
-// fitcontrol_frontend/services/EnergyExpenditureService.ts
-
 import { api } from "@/lib/api";
 import { GastoEnergeticoData } from "@/types";
 
-// Tipo para los datos que enviamos a la API
+//tipo para los datos que enviamos a la API
 type UpsertPayload = Omit<
   GastoEnergeticoData,
   | "tmb"
@@ -14,16 +12,14 @@ type UpsertPayload = Omit<
 >;
 
 export const energyExpenditureService = {
-  /**
-   * Obtiene los datos de gasto energético de un usuario.
-   */
+  //Obtiene los datos de gasto energético de un usuario.
+
   getGastoEnergetico: (userId: string) => {
     return api.get<GastoEnergeticoData>(`/gasto-energetico/${userId}`);
   },
 
-  /**
-   * Calcula y guarda los datos de gasto energético de un usuario.
-   */
+  //Calcula y guarda los datos de gasto energético de un usuario.
+
   upsertGastoEnergetico: (payload: UpsertPayload) => {
     return api.post<GastoEnergeticoData>("/gasto-energetico", payload);
   },

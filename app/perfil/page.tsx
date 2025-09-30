@@ -1,22 +1,18 @@
-// app/perfil/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-//import { supabase } from "@/lib/supabase";
-import "./perfil.css"; // Crearemos este archivo de estilos
+import "./perfil.css";
 import { useTheme } from "@/components/ThemeContext";
 import Swal from "sweetalert2";
 import { ProfileData } from "@/types";
 import { profileService } from "@/services/ProfileService";
 
-// --- TIPOS ---
 interface UserInfo {
   id: string;
   nombre: string;
   email: string;
 }
 
-// --- COMPONENTE PRINCIPAL ---
 export default function PerfilPage() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +32,7 @@ export default function PerfilPage() {
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
 
-      // --- 3. ÚNICA LLAMADA A LA API ---
+      //llamada a la API
       const response = await profileService.getProfileData(userData.id);
       if (response.success && response.data) {
         setProfileData(response.data);
@@ -55,25 +51,24 @@ export default function PerfilPage() {
 
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
-    // Llamada a la API a través del servicio
+    //Llamada a la API a través del servicio
     const response = await profileService.updateUser(userId, {
       nombre_usuario: nuevoNombre.trim(),
     });
 
     if (response.success && response.data) {
-      // Ahora TypeScript sabe que response.data es de tipo Usuario
       const updatedUser = response.data;
 
-      // Actualizar el estado local con la respuesta de la API
+      //Actualizar el estado local con la respuesta de la API
       setProfileData((prev) =>
         prev ? { ...prev, nombre_usuario: updatedUser.nombre_usuario } : null
       );
 
-      // Actualizar localStorage para mantener la consistencia en la app
+      //Actualizar localStorage para mantener la consistencia en la app
       const storedUser = localStorage.getItem("userFitControl");
       if (storedUser) {
         const userData: UserInfo = JSON.parse(storedUser);
-        // Actualizamos el nombre en el objeto antes de guardarlo de nuevo
+        //Actualizamos el nombre en el objeto antes de guardarlo de nuevo
         userData.nombre = updatedUser.nombre_usuario;
         localStorage.setItem("userFitControl", JSON.stringify(userData));
       }
@@ -102,7 +97,7 @@ export default function PerfilPage() {
 
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
-    // Actualización optimista de la UI para una respuesta instantánea
+    //Actualización optimista de la UI para una respuesta instantánea
     setProfileData({ ...profileData, unidad_peso: nuevaUnidad });
 
     const response = await profileService.updateUser(userId, {
@@ -116,7 +111,7 @@ export default function PerfilPage() {
         title: "Error",
         text: "No se pudo actualizar tu preferencia. Inténtalo de nuevo.",
       });
-      // Si falla, revertimos el cambio en la UI
+      //Si falla, revertimos el cambio en la UI
       setProfileData({
         ...profileData,
         unidad_peso: nuevaUnidad === "kg" ? "lbs" : "kg",
@@ -132,7 +127,7 @@ export default function PerfilPage() {
     );
   }
 
-  //Lógica para mostrar el peso convertido ---
+  //Lógica para mostrar el peso convertido
   const pesoMostrado =
     profileData?.unidad_peso === "lbs" && profileData.peso_actual
       ? (profileData.peso_actual * 2.20462).toFixed(1)

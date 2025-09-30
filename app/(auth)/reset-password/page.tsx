@@ -1,9 +1,8 @@
-// app/reset-password/page.tsx
 "use client";
 
 import { useState } from "react";
 import { authService } from "@/lib/api";
-import "./reset-password.css"; // Usaremos un CSS compartido
+import "./reset-password.css"; // usaré un CSS compartido
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
@@ -17,7 +16,7 @@ export default function ResetPasswordPage() {
 
     const result = await authService.sendPasswordResetEmail(email);
 
-    // Siempre mostramos un mensaje genérico por seguridad
+    //Siempre mostrar un mensaje genérico por seguridad
     setMessage(
       "Si existe una cuenta con este correo, recibirás un enlace para resetear tu contraseña."
     );

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-//import { supabase } from "@/lib/supabase";
 import {
   Dieta,
   TiempoComida,
@@ -14,7 +13,7 @@ import { useTheme } from "@/components/ThemeContext";
 import "./dieta.css";
 import { dietService } from "@/services/DietService";
 
-// --- TIPOS ---
+//TIPOS
 interface UserInfo {
   id: string;
 }

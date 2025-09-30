@@ -1,4 +1,3 @@
-/* Estilos base del header */
 .header {
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -18,7 +17,6 @@
   padding: 0 1rem;
 }
 
-/* Logo */
 .logo-link {
   font-size: 1.5rem;
   font-weight: bold;
@@ -27,7 +25,6 @@
   transition: font-size 0.3s;
 }
 
-/* Acciones de usuario */
 .user-actions {
   display: flex;
   align-items: center;
@@ -50,12 +47,10 @@
 .user-name {
   font-weight: 500;
   color: #444444;
-  /* Añadimos transición para que el ocultado sea suave */
   transition: opacity 0.3s, width 0.3s;
-  white-space: nowrap; /* Evita que el nombre se parta en dos líneas */
+  white-space: nowrap;
 }
 
-/* Botón de tema */
 .theme-toggle {
   background: none;
   border: none;
@@ -63,7 +58,7 @@
   padding: 0.5rem;
   border-radius: 50%;
   transition: background-color 0.2s;
-  display: flex; /* Para centrar el ícono */
+  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -78,7 +73,6 @@
   color: #ffc70e;
 }
 
-/* Modo oscuro */
 .dark .header {
   background-color: rgb(43, 43, 43);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -100,14 +94,12 @@
 .dark .theme-icon {
   color: #ffe600;
 }
-/* Estilos para pantallas de 400px o menos */
+
 @media (max-width: 400px) {
-  /* Reducimos el espacio entre los botones de acción */
   .user-actions {
     gap: 0.75rem;
   }
 
-  /* Reducimos un poco el tamaño del logo */
   .logo-link {
     font-size: 1.25rem;
   }

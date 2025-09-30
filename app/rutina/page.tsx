@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import "./rutina.css";
 import { useTheme } from "@/components/ThemeContext";
 
-// --- TIPOS ---
+//tipos
 interface UserInfo {
   id: string;
   nombre: string;
@@ -20,7 +20,6 @@ interface DailyExercise extends RutinaDiaEjercicio {
   completado: boolean;
 }
 
-// --- COMPONENTE PRINCIPAL ---
 export default function RutinasPage() {
   const [rutinas, setRutinas] = useState<Rutina[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +71,7 @@ export default function RutinasPage() {
   }, [userId, fetchRutinasCompletas]);
 
   const handleOpenModalParaCrear = () => {
-    // Si el array de rutinas ya tiene al menos un elemento
+    //Si el array de rutinas ya tiene al menos un elemento
     if (rutinas.length > 0) {
       const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
       Swal.fire({
@@ -84,7 +83,7 @@ export default function RutinasPage() {
         confirmButtonText: "Entendido",
       });
     } else {
-      // Si no hay rutinas, abre el modal como antes
+      //Si no hay rutinas, abre el modal como antes
       setRutinaParaEditar(null);
       setIsModalOpen(true);
     }
@@ -177,7 +176,7 @@ export default function RutinasPage() {
   );
 }
 
-// --- SUB-COMPONENTE PARA EL SEGUIMIENTO DIARIO ---
+//sub-componente de seguimiento diario
 function DailyRoutineTracker({
   userId,
   onUpdate,
@@ -293,7 +292,7 @@ function DailyRoutineTracker({
   );
 }
 
-// --- SUB-COMPONENTE PARA LA RACHA Y CALENDARIO ---
+//sub-componente de la racha y calendario
 function StreakTracker({
   racha,
   calendario,

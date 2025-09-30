@@ -56,11 +56,3 @@ a {
   background-color: rgba(32, 32, 32, 1);
   color: #f8fafc;
 }
-
-/*
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-*/

@@ -1,4 +1,3 @@
-/* Estilos base del footer */
 .footer {
   padding: 2rem 1rem;
   border-top: 1px solid var(--footer-border);
@@ -15,7 +14,6 @@
   gap: 2rem;
 }
 
-/* Contacto */
 .contact-info {
   flex: 1;
   min-width: 200px;
@@ -51,7 +49,6 @@
   color: var(--footer-accent);
 }
 
-/* Redes sociales */
 .social-links {
   flex: 1;
   min-width: 200px;
@@ -73,7 +70,6 @@
   color: var(--footer-accent);
 }
 
-/* Copyright */
 .copyright {
   text-align: center;
   margin-top: 2rem;
@@ -83,7 +79,6 @@
   color: var(--footer-text-secondary);
 }
 
-/* Variables para modo claro */
 .light {
   --footer-bg: #ffffff;
   --footer-border: #e5e7eb;
@@ -93,7 +88,6 @@
   --footer-accent: #e2cc00;
 }
 
-/* Variables para modo oscuro */
 .dark {
   --footer-bg: rgba(32, 32, 32, 1);
   --footer-border: rgb(53, 53, 53);

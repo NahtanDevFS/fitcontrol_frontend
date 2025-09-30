@@ -1,4 +1,3 @@
-// app/update-password/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,9 +19,9 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // Cuando la sesión de recuperación de contraseña está lista...
+        //Cuando la sesión de recuperación de contraseña está lista
         if (event === "PASSWORD_RECOVERY" && session) {
-          setSession(session); // ¡Guardamos el token!
+          setSession(session);
         }
       }
     );
