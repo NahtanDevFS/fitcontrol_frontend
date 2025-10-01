@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { authService } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import "../reset-password/reset-password.css";
@@ -18,7 +19,6 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        //Cuando la sesión de recuperación de contraseña está lista
         if (event === "PASSWORD_RECOVERY" && session) {
           setSession(session);
         }
@@ -59,8 +59,21 @@ export default function UpdatePasswordPage() {
     return (
       <div className="reset-container">
         <div className="reset-form-box">
-          <h1>Verificando...</h1>
-          <p>Por favor, espera un momento mientras validamos tu solicitud.</p>
+          <div className="reset-header">
+            <Image
+              src="/favicon.ico"
+              alt="FitControl Logo"
+              width={50}
+              height={50}
+              className="reset-logo"
+            />
+            <h1>FitControl</h1>
+          </div>
+          <p className="reset-password-description">Gestiona tu vida Fitness</p>
+          <h2>Verificando...</h2>
+          <p className="reset-subtitle">
+            Por favor, espera un momento mientras validamos tu solicitud.
+          </p>
         </div>
       </div>
     );
@@ -69,7 +82,18 @@ export default function UpdatePasswordPage() {
   return (
     <div className="reset-container">
       <div className="reset-form-box">
-        <h1>Establecer Nueva Contraseña</h1>
+        <div className="reset-header">
+          <Image
+            src="/favicon.ico"
+            alt="FitControl Logo"
+            width={50}
+            height={50}
+            className="reset-logo"
+          />
+          <h1>FitControl</h1>
+        </div>
+
+        <h2>Establecer Nueva Contraseña</h2>
         {error && <div className="error-message">{error}</div>}
         {message && <div className="success-message">{message}</div>}
         <form onSubmit={handleSubmit}>

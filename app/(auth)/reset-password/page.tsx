@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { authService } from "@/lib/api";
-import "./reset-password.css"; // usaré un CSS compartido
+import "./reset-password.css";
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,6 @@ export default function ResetPasswordPage() {
 
     const result = await authService.sendPasswordResetEmail(email);
 
-    //Siempre mostrar un mensaje genérico por seguridad
     setMessage(
       "Si existe una cuenta con este correo, recibirás un enlace para resetear tu contraseña."
     );
@@ -26,7 +26,19 @@ export default function ResetPasswordPage() {
   return (
     <div className="reset-container">
       <div className="reset-form-box">
-        <h1>Recuperar Contraseña</h1>
+        <div className="reset-header">
+          <Image
+            src="/favicon.ico"
+            alt="FitControl Logo"
+            width={50}
+            height={50}
+            className="reset-logo"
+          />
+          <h1>FitControl</h1>
+        </div>
+        <p className="reset-password-description">Gestiona tu vida Fitness</p>
+
+        <h2>Recuperar Contraseña</h2>
         <p className="reset-subtitle">
           Ingresa tu correo y te llegará un enlace para recuperar tu cuenta.
         </p>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { authService } from "@/lib/api";
 import "./register.css";
 
@@ -39,7 +40,19 @@ export default function RegisterPage() {
   return (
     <div className="register-container">
       <div className="register-form-box">
-        <h1>Crear Cuenta</h1>
+        <div className="register-header">
+          <Image
+            src="/favicon.ico"
+            alt="FitControl Logo"
+            width={50}
+            height={50}
+            className="register-logo"
+          />
+          <h1>FitControl</h1>
+        </div>
+        <p className="register-description">Gestiona tu vida Fitness</p>
+
+        <h2>Crear Cuenta</h2>
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 

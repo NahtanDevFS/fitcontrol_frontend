@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { authService } from "@/lib/api";
 import "./login.css";
 
@@ -20,8 +21,9 @@ export default function LoginPage() {
     const result = await authService.login(email, password);
 
     if (result.success && result.data?.session) {
-      //Guardar token en localStorage
+      // Guardar token en localStorage
       localStorage.setItem("authToken", result.data.session.access_token);
+      localStorage.setItem("userFitControl", JSON.stringify(result.data.user));
       router.push("/dashboard");
     } else {
       setError(result.error || "Credenciales incorrectas");
@@ -32,7 +34,19 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       <div className="login-form-box">
-        <h1>Iniciar Sesión</h1>
+        <div className="login-header">
+          <Image
+            src="/favicon.ico"
+            alt="FitControl Logo"
+            width={50}
+            height={50}
+            className="login-logo"
+          />
+          <h1>FitControl</h1>
+        </div>
+        <p className="login-description">Gestiona tu vida Fitness</p>
+
+        <h2>Iniciar Sesión</h2>
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
