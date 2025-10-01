@@ -136,10 +136,9 @@ export default function DietaPage() {
   return (
     <div className="dieta-container">
       <header className="page-header">
-        <h1>Mi Dieta y Cumplimiento</h1>
+        <h1>Mi dieta y racha</h1>
       </header>
 
-      {/* --- NUEVOS COMPONENTES DE CUMPLIMIENTO --- */}
       <DailyDietTracker
         key={`daily-${dieta.id_dieta}`}
         userId={userId!}
@@ -276,7 +275,7 @@ function DailyDietTracker({
   }, [userId, fetchCompliance]);
 
   const handleCheckMeal = async (meal: any, newStatus: boolean) => {
-    // Actualización optimista de la UI (funciona porque 'meal' es ahora el objeto completo)
+    //Actualización optimista de la UI
     setComidasDeHoy((prev) =>
       prev.map((c) =>
         c.id_dieta_alimento === meal.id_dieta_alimento
@@ -284,7 +283,7 @@ function DailyDietTracker({
           : c
       )
     );
-    // Llamada a la API con el ID de cumplimiento correcto
+    //Llamada a la API con el ID de cumplimiento correcto
     await dietService.updateMealCompliance(
       meal.id_cumplimiento_dieta,
       newStatus
@@ -325,9 +324,9 @@ function DailyDietTracker({
   if (diaCumplido) {
     return (
       <div className="tracker-container">
-        <h3>Cumplimiento de Hoy: {nombreDiaHoy}</h3>
+        <h3>Tu dieta de hoy: {nombreDiaHoy}</h3>
         <div className="tracker-cumplido">
-          <p>🎉 ¡Dieta del día completada! ¡Sigue así! 🎉</p>
+          <p>¡Ya completaste tu dieta de hoy! ¡Bien hecho!</p>
         </div>
       </div>
     );
@@ -339,7 +338,7 @@ function DailyDietTracker({
     return (
       <div className="tracker-container">
         <h3>Hoy es un Cheat Day</h3>
-        <p>No tienes comidas registradas para hoy.</p>
+        <p>No tienes comidas registradas para hoy</p>
       </div>
     );
   }
@@ -349,7 +348,7 @@ function DailyDietTracker({
 
   return (
     <div className="tracker-container">
-      <h3>Cumplimiento de Hoy: {nombreDiaHoy}</h3>
+      <h3>Tu dieta de hoy: {nombreDiaHoy}</h3>
       <>
         <ul className="meal-checklist">
           {comidasDeHoy.map((comida) => (
@@ -392,9 +391,7 @@ function DietStreakTracker({
 }) {
   const fillerDays = [];
   if (calendario.length > 0) {
-    // Se crea un objeto Date para obtener el día de la semana.
-    // OJO: Los strings de fecha "YYYY-MM-DD" se interpretan como UTC,
-    // por lo que usamos getUTCDay() para obtener el día correcto sin problemas de zona horaria.
+    // Se crea un objeto Date para obtener el día de la semana, los strings de fecha "YYYY-MM-DD" se interpretan como UTC, por lo que uso getUTCDay() para obtener el día correcto sin problemas de zona horaria
     const firstDayOfWeek = new Date(calendario[0].fecha).getUTCDay();
     for (let i = 0; i < firstDayOfWeek; i++) {
       fillerDays.push(
@@ -403,13 +400,20 @@ function DietStreakTracker({
     }
   }
 
+  const ahora = new Date();
+  const mesYAnio = ahora.toLocaleString("es-ES", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div className="streak-container">
       <div className="streak-counter">
-        <h3>Racha de Dieta</h3>
+        <h3>Racha actual</h3>
         {loading ? <p>...</p> : <p className="streak-days">🔥 {racha} Días</p>}
       </div>
       <div className="streak-calendar">
+        <div className="calendar-month-year">{mesYAnio}</div>
         <div className="calendar-header">
           <span>D</span>
           <span>L</span>
@@ -432,7 +436,6 @@ function DietStreakTracker({
   );
 }
 
-// --- subcomponente modal para añadir y editar alimentos ---
 interface AddFoodModalProps {
   dietaId: number;
   dayName: string;
@@ -443,7 +446,7 @@ interface AddFoodModalProps {
   darkMode: boolean;
 }
 
-// --- SUB-COMPONENTE MODAL PARA AÑADIR ALIMENTOS (CON BÚSQUEDA PRIORIZADA) ---
+//sub-componente modal para añadir alimentos con búsqueda priorizada
 function AddFoodModal({
   dietaId,
   dayName,
@@ -464,9 +467,6 @@ function AddFoodModal({
 
   useEffect(() => {
     if (foodToEdit) {
-      // --- LÓGICA DE EDICIÓN MEJORADA ---
-      // Recreamos el objeto 'selectedFood' con la estructura que el resto del componente espera.
-      // Extraemos el nombre real del alimento del string guardado.
       const nombreReal = foodToEdit.nombre_alimento.replace(/^\d+g\sde\s/, "");
       setSelectedFood({ description: nombreReal });
 
@@ -580,13 +580,13 @@ function AddFoodModal({
     try {
       let response;
       if (foodToEdit) {
-        // --- LLAMADA PARA ACTUALIZAR ---
+        //llamada para actualizar
         response = await dietService.updateFood(
           foodToEdit.id_dieta_alimento_detalle!,
           foodData
         );
       } else {
-        // --- LLAMADA PARA CREAR ---
+        //llamada para crear
         const payload = {
           ...foodData,
           id_dieta: dietaId,
@@ -669,8 +669,6 @@ function AddFoodModal({
           </>
         ) : (
           <div className="nutrition-details">
-            {/* --- CORRECCIÓN CLAVE AQUÍ --- */}
-            {/* Usamos '?' para acceder de forma segura y un fallback '||' */}
             <h3>{selectedFood?.description || "Detalles del Alimento"}</h3>
 
             <div className="quantity-selector">

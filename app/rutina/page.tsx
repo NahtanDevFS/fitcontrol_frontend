@@ -78,7 +78,7 @@ export default function RutinasPage() {
         ...swalTheme,
         icon: "info",
         title: "Ya tienes una rutina",
-        text: "No puedes agregar una nueva rutina porque ya tienes una establecida. Te recomiendo editar la existente para ajustarla a tus necesidades :)",
+        text: "No puedes agregar una nueva rutina porque ya tienes una establecida, te recomiendo editar la existente para ajustarla a tus necesidades :)",
         confirmButtonColor: "#ffe70e",
         confirmButtonText: "Entendido",
       });
@@ -119,9 +119,9 @@ export default function RutinasPage() {
   return (
     <div className="rutinas-container">
       <header className="page-header">
-        <h1>Mis Rutinas</h1>
+        <h1>Mi rutina y racha</h1>
         <button className="btn btn-primary" onClick={handleOpenModalParaCrear}>
-          Crear Rutina
+          Crear rutina
         </button>
       </header>
 
@@ -141,7 +141,7 @@ export default function RutinasPage() {
         </>
       )}
 
-      <h2 className="section-title">Biblioteca de Rutinas</h2>
+      <h2 className="section-title">Mi rutina de ejercicios</h2>
       <div className="rutinas-grid">
         {rutinas.map((rutina) => (
           <RoutineCard
@@ -156,7 +156,7 @@ export default function RutinasPage() {
       {rutinas.length === 0 && !loading && (
         <div className="empty-state">
           <h2>No tienes rutinas</h2>
-          <p>¡Crea tu primera rutina para empezar a entrenar!</p>
+          <p>Crea tu primera rutina para empezar a entrenar</p>
         </div>
       )}
 
@@ -226,7 +226,7 @@ function DailyRoutineTracker({
     if (response.success) {
       setDiaCumplido(true);
       onUpdate();
-      Swal.fire("¡Felicidades!", "Has cumplido tu rutina de hoy.", "success");
+      Swal.fire("Felicidades,", "Has cumplido tu rutina de hoy.", "success");
     } else {
       Swal.fire("Error", "No se pudo marcar el día como cumplido.", "error");
     }
@@ -249,10 +249,10 @@ function DailyRoutineTracker({
 
   return (
     <div className="tracker-container">
-      <h3>Tu Entrenamiento de Hoy: {diaDeHoy.dia_semana}</h3>
+      <h3>Tu entrenamiento de hoy: {diaDeHoy.dia_semana}</h3>
       {diaCumplido ? (
         <div className="tracker-cumplido">
-          <p>🎉 ¡Ya completaste tu rutina de hoy! ¡Excelente trabajo! 🎉</p>
+          <p>¡Ya completaste tu rutina de hoy! ¡Bien hecho!</p>
         </div>
       ) : (
         <>
@@ -284,7 +284,7 @@ function DailyRoutineTracker({
             disabled={!todosCompletados}
             style={{ width: "100%", marginTop: "20px" }}
           >
-            Marcar Día como Cumplido
+            Marcar día como cumplido
           </button>
         </>
       )}
@@ -312,10 +312,16 @@ function StreakTracker({
     }
   }
 
+  const ahora = new Date();
+  const mesYAnio = ahora.toLocaleString("es-ES", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div className="streak-container">
       <div className="streak-counter">
-        <h3>Racha Actual</h3>
+        <h3>Racha actual</h3>
         {loadingStreak ? (
           <p>...</p>
         ) : (
@@ -323,6 +329,7 @@ function StreakTracker({
         )}
       </div>
       <div className="streak-calendar">
+        <div className="calendar-month-year">{mesYAnio}</div>
         <div className="calendar-header">
           <span>D</span>
           <span>L</span>

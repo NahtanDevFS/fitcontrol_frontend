@@ -74,7 +74,7 @@ export default function MetasPage() {
   return (
     <div className="metas-container">
       <header className="page-header">
-        <h1>Mi Progreso</h1>
+        <h1>Mi progreso</h1>
       </header>
 
       {progresoActivo ? (
@@ -353,7 +353,7 @@ function ProgressTracker({
   if (metaAlcanzada) {
     return (
       <div className="goal-card goal-completed">
-        <h2>¡FELICIDADES! 🥳</h2>
+        <h2>¡felicidades!</h2>
         <p>
           Has alcanzado tu objetivo de {pesoDeseadoMostrado} {unidadPeso}.
           ¡Excelente trabajo!
@@ -421,7 +421,7 @@ function ProgressTracker({
           {loading ? "Actualizando..." : "Actualizar Peso"}
         </button>
       </form>
-      <button className="btn-link" onClick={handleNuevoObjetivo}>
+      <button className="btn btn-link" onClick={handleNuevoObjetivo}>
         Empezar un nuevo objetivo
       </button>
     </div>

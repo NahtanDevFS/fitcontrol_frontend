@@ -69,28 +69,28 @@ export default function DashboardPage() {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Bienvenido de vuelta, {data?.nombreUsuario}!</h1>
-        <p>Aquí tienes un resumen de tu progreso. ¡Sigue así!</p>
+        <h1>Bienvenido, {data?.nombreUsuario}</h1>
+        <p>Aquí tienes un resumen de tu progreso</p>
       </header>
 
       <div className="dashboard-grid">
-        <DashboardCard title="Mi Rutina" icon="🏋️" link="/rutina">
+        <DashboardCard title="Mi rutina" link="/rutina">
           <p className="card-metric">🔥 {data?.rachaRutina} Días de Racha</p>
           <p className="card-description">
-            ¡No la rompas! Revisa tu entrenamiento de hoy y marca tus ejercicios
-            como completados.
+            Cumple tu racha de hoy, revisa tu entrenamiento de hoy y marca tus
+            ejercicios como completados
           </p>
         </DashboardCard>
 
-        <DashboardCard title="Mi Dieta" icon="🥗" link="/dieta">
+        <DashboardCard title="Mi dieta" link="/dieta">
           <p className="card-metric">🔥 {data?.rachaDieta} Días de Racha</p>
           <p className="card-description">
-            La nutrición es clave. Registra tus comidas y mantén tu racha de
-            alimentación saludable.
+            Cumple tu racha de hoy, registra tus comidas y mantén tu racha de
+            alimentación saludable
           </p>
         </DashboardCard>
 
-        <DashboardCard title="Mi Progreso" icon="📊" link="/metas">
+        <DashboardCard title="Mi meta de peso" link="/metas">
           {data?.pesoActual ? (
             <p className="card-metric">
               {pesoActualMostrado} {data.unidadPeso} <br />
@@ -102,19 +102,14 @@ export default function DashboardPage() {
             <p className="card-metric">Sin Meta Activa</p>
           )}
           <p className="card-description">
-            Define tu meta de peso y actualiza tu progreso para ver tu
-            evolución.
+            Define tu meta de peso y actualiza tu progreso para ver tu evolución
           </p>
         </DashboardCard>
 
-        <DashboardCard
-          title="Gasto Energético"
-          icon="⚡"
-          link="/gasto-energetico"
-        >
+        <DashboardCard title="Mi estado calórico" link="/gasto-energetico">
           <p className="card-description" style={{ marginTop: "15px" }}>
             Calcula tus calorías de mantenimiento, déficit o superávit para
-            ajustar tu dieta a tus objetivos.
+            ajustar tu dieta a tus objetivos
           </p>
         </DashboardCard>
       </div>
@@ -125,20 +120,18 @@ export default function DashboardPage() {
 //sub-componente reutilizable para las cards
 interface DashboardCardProps {
   title: string;
-  icon: string;
   link: string;
   children: React.ReactNode;
 }
 
-function DashboardCard({ title, icon, link, children }: DashboardCardProps) {
+function DashboardCard({ title, link, children }: DashboardCardProps) {
   return (
     <Link href={link} className="dashboard-card">
       <div className="card-header">
-        <span className="card-icon">{icon}</span>
         <h2 className="card-title">{title}</h2>
       </div>
       <div className="card-content">{children}</div>
-      <div className="card-footer">Ir al Módulo</div>
+      <div className="card-footer">Ir al módulo</div>
     </Link>
   );
 }

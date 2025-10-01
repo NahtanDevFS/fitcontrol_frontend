@@ -136,7 +136,7 @@ export default function PerfilPage() {
   return (
     <div className="profile-container">
       <header className="page-header">
-        <h1>Mi Perfil</h1>
+        <h1>Mi perfil</h1>
       </header>
 
       <div className="profile-card">

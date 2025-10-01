@@ -530,6 +530,15 @@ day-column-header {
   padding-bottom: 0;
 }
 
+.calendar-month-year {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  color: var(--accent-color);
+  text-transform: capitalize;
+}
+
 @media (min-width: 768px) {
   .streak-container {
     flex-direction: row;

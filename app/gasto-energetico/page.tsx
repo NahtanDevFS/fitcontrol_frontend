@@ -82,13 +82,13 @@ export default function GastoEnergeticoPage() {
   return (
     <div className="ge-container">
       <header className="page-header-ge">
-        <h1>Gasto Energético y Macros</h1>
+        <h1>Mi estado calórico</h1>
         {datosGuardados && !showForm && (
           <button
             className="btn btn-secondary"
             onClick={() => setShowForm(true)}
           >
-            Volver a Calcular
+            Volver a calcular
           </button>
         )}
       </header>
