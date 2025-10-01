@@ -1,4 +1,3 @@
-// app/dieta/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -13,7 +12,7 @@ import { useTheme } from "@/components/ThemeContext";
 import "./dieta.css";
 import { dietService } from "@/services/DietService";
 
-//TIPOS
+//tipos
 interface UserInfo {
   id: string;
 }
@@ -321,8 +320,8 @@ function DailyDietTracker({
     );
   }
 
-  // 1. Primero, verificamos si el día ya está cumplido.
-  //    Si es así, mostramos el mensaje de éxito y terminamos.
+  //verificamos si el día ya está cumplido.
+  //Si es así, mostramos el mensaje de éxito y terminamos.
   if (diaCumplido) {
     return (
       <div className="tracker-container">
@@ -334,8 +333,8 @@ function DailyDietTracker({
     );
   }
 
-  // 2. Si no está cumplido, AHORA SÍ verificamos si hay comidas.
-  //    Si no hay, es un día de descanso o "cheat day".
+  //Si no está cumplido, verificamos si hay comidas
+  //si no hay, es un día de descanso o "cheat day"
   if (comidasDeHoy.length === 0) {
     return (
       <div className="tracker-container">
@@ -345,7 +344,7 @@ function DailyDietTracker({
     );
   }
 
-  // 3. Si no está cumplido y sí hay comidas, mostramos la lista.
+  //Si no está cumplido y sí hay comidas, mostramos la lista.
   const allMealsChecked = comidasDeHoy.every((c) => c.cumplido);
 
   return (
@@ -408,7 +407,7 @@ function DietStreakTracker({
     <div className="streak-container">
       <div className="streak-counter">
         <h3>Racha de Dieta</h3>
-        {loading ? <p>...</p> : <p className="streak-days">🥗 {racha} Días</p>}
+        {loading ? <p>...</p> : <p className="streak-days">🔥 {racha} Días</p>}
       </div>
       <div className="streak-calendar">
         <div className="calendar-header">

@@ -216,7 +216,7 @@ export default function PerfilPage() {
           <div className="stat-item">
             <span>Racha de Dieta</span>
             <strong className="stat-value">
-              🥗 {profileData?.racha_dieta} Días
+              🔥 {profileData?.racha_dieta} Días
             </strong>
           </div>
         </div>

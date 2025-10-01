@@ -83,7 +83,7 @@ export default function DashboardPage() {
         </DashboardCard>
 
         <DashboardCard title="Mi Dieta" icon="🥗" link="/dieta">
-          <p className="card-metric">🥗 {data?.rachaDieta} Días de Racha</p>
+          <p className="card-metric">🔥 {data?.rachaDieta} Días de Racha</p>
           <p className="card-description">
             La nutrición es clave. Registra tus comidas y mantén tu racha de
             alimentación saludable.
