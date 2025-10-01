@@ -173,7 +173,7 @@ export const authService = {
     password: string,
     session: Session
   ): Promise<ApiResponse> => {
-    // El backend necesita el access_token y refresh_token para establecer la sesión
+    //El backend necesita el access_token y refresh_token para establecer la sesión
     return api.post("/auth/update-password", {
       password,
       access_token: session.access_token,

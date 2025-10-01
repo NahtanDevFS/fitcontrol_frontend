@@ -81,7 +81,6 @@ export const dietService = {
   },
 
   //Actualiza el estado de cumplimiento para todo el día.
-
   updateDayCompliance: (dayComplianceId: number, cumplido: boolean) => {
     return api.put(`/cumplimiento-dieta-dia/${dayComplianceId}`, { cumplido });
   },

@@ -29,7 +29,6 @@ export const progressService = {
   },
 
   //Crea un nuevo registro de progreso para un usuario.
-
   createProgreso: (progresoData: CreateProgresoPayload) => {
     //La API espera un POST en la ruta base del progreso
     return api.post<Progreso>("/progreso-usuario", progresoData);
