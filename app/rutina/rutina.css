@@ -163,7 +163,7 @@ html.dark {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 20000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
@@ -179,12 +179,13 @@ html.dark {
   padding: 30px;
   border-radius: 10px;
   width: 90%;
-  max-width: 850px;
+  max-width: 1100px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   transform: scale(0.9);
   transition: transform 0.3s;
+  z-index: 20000;
 }
 
 .modal-overlay.open .modal-content {
@@ -535,10 +536,9 @@ html.dark {
   }
 
   .exercise-row {
-    /* Cambiamos el grid a una sola columna (layout vertical) */
     grid-template-columns: 1fr;
-    gap: 15px; /* Espacio entre los elementos apilados */
-    margin-bottom: 25px; /* Más espacio entre cada fila de ejercicio */
+    gap: 15px;
+    margin-bottom: 25px;
     padding-bottom: 15px;
     border-bottom: 1px solid var(--border-color);
   }

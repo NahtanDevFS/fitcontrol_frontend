@@ -368,15 +368,16 @@ html.dark {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 20000;
 }
 .modal-content {
   background-color: var(--modal-overlay-bg);
   padding: 25px;
   border-radius: 10px;
   width: 90%;
-  max-width: 850px;
+  max-width: 1100px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 20000;
 }
 .modal-header {
   display: flex;

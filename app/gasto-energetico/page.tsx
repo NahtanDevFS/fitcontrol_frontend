@@ -81,7 +81,7 @@ export default function GastoEnergeticoPage() {
 
   return (
     <div className="ge-container">
-      <header className="page-header">
+      <header className="page-header-ge">
         <h1>Gasto Energético y Macros</h1>
         {datosGuardados && !showForm && (
           <button

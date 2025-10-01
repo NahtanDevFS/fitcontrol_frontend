@@ -138,7 +138,7 @@ function DashboardCard({ title, icon, link, children }: DashboardCardProps) {
         <h2 className="card-title">{title}</h2>
       </div>
       <div className="card-content">{children}</div>
-      <div className="card-footer">Ir al Módulo →</div>
+      <div className="card-footer">Ir al Módulo</div>
     </Link>
   );
 }
