@@ -39,7 +39,6 @@ const DIAS_SEMANA = [
 ];
 const TIEMPOS_COMIDA = ["Desayuno", "Almuerzo", "Cena", "Snacks"];
 
-// --- COMPONENTE PRINCIPAL ---
 export default function DietaPage() {
   const [dieta, setDieta] = useState<Dieta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -103,7 +102,7 @@ export default function DietaPage() {
       cancelButtonText: "Cancelar",
     });
     if (result.isConfirmed) {
-      // --- LLAMADA AL SERVICIO ---
+      //llamada al servicio
       const response = await dietService.deleteFood(alimentoId);
 
       if (!response.success) {

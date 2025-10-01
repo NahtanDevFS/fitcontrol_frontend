@@ -12,7 +12,6 @@ export default function UpdatePasswordPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sessionToken, setSessionToken] = useState<string | null>(null); // Estado para guardar el token
   const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 

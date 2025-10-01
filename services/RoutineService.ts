@@ -31,17 +31,17 @@ interface RoutinePayload {
 export const routineService = {
   //Obtiene UNA SOLA rutina por su ID.
   //Esta es la función clave para tu formulario de "Editar".
-  getRutinaById: (rutinaId: number | string) => {
-    return api.get<Rutina>(`/rutina/${rutinaId}`);
-  },
+  // getRutinaById: (rutinaId: number | string) => {
+  //   return api.get<Rutina>(`/rutina/${rutinaId}`);
+  // },
 
   getRutinasCompletas: (userId: string) => {
     return api.get<RutinaCompletaResponse>(`/rutina/completa/${userId}`);
   },
 
-  getRutinasByUserId: (userId: string) => {
-    return api.get<Rutina[]>(`/rutina/usuario/${userId}`);
-  },
+  // getRutinasByUserId: (userId: string) => {
+  //   return api.get<Rutina[]>(`/rutina/usuario/${userId}`);
+  // },
 
   deleteRutina: (rutinaId: number) => {
     return api.delete(`/rutina/${rutinaId}`);
