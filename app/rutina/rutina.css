@@ -253,7 +253,7 @@ html.dark {
   display: grid;
   grid-template-columns: 5fr 2fr 2fr 2fr 1fr;
   gap: 10px;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 10px;
 }
 
@@ -528,7 +528,7 @@ html.dark {
   display: grid;
   grid-template-columns: 3fr 3fr 3fr 1fr 1fr 1fr auto;
   gap: 10px;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 10px;
 }
 
