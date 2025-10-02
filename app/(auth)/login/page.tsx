@@ -15,47 +15,44 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === "SIGNED_IN" && session) {
-          const { data: userData, error: userError } = await supabase
-            .from("usuario")
-            .select("*")
-            .eq("id_usuario", session.user.id)
-            .single();
+  // useEffect(() => {
+  //   const { data: authListener } = supabase.auth.onAuthStateChange(
+  //     async (event, session) => {
+  //       if (event === "SIGNED_IN" && session) {
+  //         const { data: userData, error: userError } = await supabase
+  //           .from("usuario")
+  //           .select("*")
+  //           .eq("id_usuario", session.user.id)
+  //           .single();
 
-          if (userError || !userData) {
-            console.error("Error al obtener el perfil del usuario:", userError);
-            setError("No se pudo cargar el perfil del usuario.");
-            return;
-          }
+  //         if (userError || !userData) {
+  //           console.error("Error al obtener el perfil del usuario:", userError);
+  //           setError("No se pudo cargar el perfil del usuario.");
+  //           return;
+  //         }
 
-          const userToStore = {
-            id: userData.id_usuario,
-            nombre: userData.nombre_usuario,
-            email: userData.correo_usuario,
-          };
+  //         const userToStore = {
+  //           id: userData.id_usuario,
+  //           nombre: userData.nombre_usuario,
+  //           email: userData.correo_usuario,
+  //         };
+  //         //Crear la cookie que el middleware necesita
+  //         document.cookie = `authToken=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
 
-          // --- INICIO DE LA CORRECCIÓN ---
-          // 1. Crear la cookie que el middleware necesita
-          document.cookie = `authToken=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
+  //         //Guardar el token y los datos del usuario en localStorage
+  //         localStorage.setItem("authToken", session.access_token);
+  //         localStorage.setItem("userFitControl", JSON.stringify(userToStore));
 
-          // 2. Guardar el token y los datos del usuario en localStorage
-          localStorage.setItem("authToken", session.access_token);
-          localStorage.setItem("userFitControl", JSON.stringify(userToStore));
-          // --- FIN DE LA CORRECCIÓN ---
+  //         //Forzar una recarga completa para asegurar que el middleware lea la nueva cookie
+  //         window.location.href = "/dashboard";
+  //       }
+  //     }
+  //   );
 
-          // Forzar una recarga completa para asegurar que el middleware lea la nueva cookie
-          window.location.href = "/dashboard";
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [router]);
+  //   return () => {
+  //     authListener.subscription.unsubscribe();
+  //   };
+  // }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +62,7 @@ export default function LoginPage() {
     const result = await authService.login(email, password);
 
     if (result.success) {
-      // Esta redirección funciona porque authService.login SÍ crea la cookie
+      //Esta redirección funciona porque authService.login sí crea la cookie
       router.push("/dashboard");
     } else {
       setError(result.error || "Credenciales incorrectas");
@@ -78,8 +75,8 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        // Asegúrate de que redirige a la misma página para que el listener se active
-        redirectTo: `${window.location.origin}/login`,
+        //apunta al backend
+        redirectTo: `${process.env.NEXT_PUBLIC_API_URL_BACKEND}/api/auth/google/callback`,
       },
     });
 
