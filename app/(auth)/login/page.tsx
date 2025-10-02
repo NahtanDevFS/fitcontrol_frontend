@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { authService } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
+import { FcGoogle } from "react-icons/fc";
 import "./login.css";
 
 export default function LoginPage() {
@@ -29,6 +31,19 @@ export default function LoginPage() {
       setError(result.error || "Credenciales incorrectas");
     }
     setLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+    //Si no hay error, Supabase redirigirá al usuario a Google
   };
 
   return (
@@ -76,6 +91,19 @@ export default function LoginPage() {
             {loading ? "Cargando..." : "Iniciar Sesión"}
           </button>
         </form>
+
+        <div style={{ margin: "20px 0", textAlign: "center", color: "#aaa" }}>
+          O
+        </div>
+
+        <button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          className="auth-button-google"
+        >
+          <FcGoogle size={22} />
+          <span>Ingresar con Google</span>
+        </button>
 
         <p className="register-link">
           ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
