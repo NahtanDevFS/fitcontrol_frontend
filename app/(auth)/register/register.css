@@ -92,7 +92,7 @@
   text-align: center;
 }
 
-button {
+.auth-button {
   width: 100%;
   padding: 12px;
   background-color: #ffe70e;
@@ -105,11 +105,11 @@ button {
   transition: background-color 0.2s;
 }
 
-button:hover:not(:disabled) {
+.auth-button:hover:not(:disabled) {
   background-color: #ccb800;
 }
 
-button:disabled {
+.auth-button:disabled {
   background-color: #fff491;
   cursor: not-allowed;
 }

@@ -141,50 +141,12 @@ function CalculationForm({
 
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
-    const nEdad = Number(edad);
-    const nAltura = Number(altura);
-    let nPesoKg = Number(peso); // Asumimos que el peso está en kg por defecto
+    let nPesoKg = Number(peso); //Asumimos que el peso está en kg por defecto
 
     //Si la unidad es libras, convertimos el valor del input a kg para los cálculos
     if (unidadPeso === "lbs") {
       nPesoKg = Number(peso) / KG_TO_LBS;
     }
-
-    //los cálculos usan siempre kg y cm
-    let tmb = 0;
-    if (sexo === "hombre") {
-      tmb = 10 * nPesoKg + 6.25 * nAltura - 5 * nEdad + 5;
-    } else {
-      tmb = 10 * nPesoKg + 6.25 * nAltura - 5 * nEdad - 161;
-    }
-    tmb = Math.round(tmb);
-    const calorias_mantener = Math.round(tmb * actividad);
-    const calorias_deficit = Math.round(calorias_mantener * 0.85);
-    const calorias_superavit = Math.round(calorias_mantener * 1.15);
-    let peso_ideal_kg = 0;
-    if (nAltura > 152.4) {
-      if (sexo === "hombre") {
-        peso_ideal_kg = 50 + 2.3 * ((nAltura - 152.4) / 2.54);
-      } else {
-        peso_ideal_kg = 45.5 + 2.3 * ((nAltura - 152.4) / 2.54);
-      }
-    }
-    peso_ideal_kg = Math.round(peso_ideal_kg * 100) / 100;
-
-    //guardar en supabase en kg
-    const dataToUpsert = {
-      id_usuario: userId,
-      sexo,
-      edad: nEdad,
-      altura_cm: nAltura,
-      peso_kg: nPesoKg,
-      nivel_actividad: actividad,
-      tmb,
-      calorias_mantener,
-      calorias_deficit,
-      calorias_superavit,
-      peso_ideal_kg,
-    };
 
     const payload = {
       id_usuario: userId,

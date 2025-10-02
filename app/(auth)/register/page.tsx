@@ -91,7 +91,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="auth-button">
             {loading ? "Cargando..." : "Registrarse"}
           </button>
         </form>

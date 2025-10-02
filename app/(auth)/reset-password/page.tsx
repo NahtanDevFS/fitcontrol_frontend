@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
               required
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="auth-button">
             {loading ? "Enviando..." : "Enviar Enlace"}
           </button>
         </form>
