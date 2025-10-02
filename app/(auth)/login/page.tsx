@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { authService } from "@/lib/api";
@@ -14,6 +14,50 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        // Este evento se dispara cuando el usuario inicia sesión exitosamente
+        if (event === "SIGNED_IN" && session) {
+          // 1. Obtenemos los datos de nuestro perfil desde la tabla 'usuario'
+          const { data: userData, error: userError } = await supabase
+            .from("usuario")
+            .select("*")
+            .eq("id_usuario", session.user.id)
+            .single();
+
+          if (userError || !userData) {
+            console.error(
+              "No se encontró el perfil del usuario después del login de Google",
+              userError
+            );
+            setError("Error al obtener el perfil del usuario.");
+            return;
+          }
+
+          // 2. Creamos el objeto de usuario que guardamos en localStorage
+          const userToStore = {
+            id: userData.id_usuario,
+            nombre: userData.nombre_usuario,
+            email: userData.correo_usuario,
+          };
+
+          // 3. Guardamos la sesión y los datos del usuario, igual que en el login normal
+          localStorage.setItem("authToken", session.access_token);
+          localStorage.setItem("userFitControl", JSON.stringify(userToStore));
+
+          // 4. Redirigimos al dashboard
+          router.push("/dashboard");
+        }
+      }
+    );
+
+    // Limpiamos el listener cuando el componente se desmonta
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
