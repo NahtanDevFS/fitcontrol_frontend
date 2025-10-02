@@ -18,9 +18,7 @@ export default function LoginPage() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Este evento se dispara cuando el usuario inicia sesión exitosamente
         if (event === "SIGNED_IN" && session) {
-          // 1. Obtenemos los datos de nuestro perfil desde la tabla 'usuario'
           const { data: userData, error: userError } = await supabase
             .from("usuario")
             .select("*")
@@ -28,32 +26,32 @@ export default function LoginPage() {
             .single();
 
           if (userError || !userData) {
-            console.error(
-              "No se encontró el perfil del usuario después del login de Google",
-              userError
-            );
-            setError("Error al obtener el perfil del usuario.");
+            console.error("Error al obtener el perfil del usuario:", userError);
+            setError("No se pudo cargar el perfil del usuario.");
             return;
           }
 
-          // 2. Creamos el objeto de usuario que guardamos en localStorage
           const userToStore = {
             id: userData.id_usuario,
             nombre: userData.nombre_usuario,
             email: userData.correo_usuario,
           };
 
-          // 3. Guardamos la sesión y los datos del usuario, igual que en el login normal
+          // --- INICIO DE LA CORRECCIÓN ---
+          // 1. Crear la cookie que el middleware necesita
+          document.cookie = `authToken=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
+
+          // 2. Guardar el token y los datos del usuario en localStorage
           localStorage.setItem("authToken", session.access_token);
           localStorage.setItem("userFitControl", JSON.stringify(userToStore));
+          // --- FIN DE LA CORRECCIÓN ---
 
-          // 4. Redirigimos al dashboard
-          router.push("/dashboard");
+          // Forzar una recarga completa para asegurar que el middleware lea la nueva cookie
+          window.location.href = "/dashboard";
         }
       }
     );
 
-    // Limpiamos el listener cuando el componente se desmonta
     return () => {
       authListener.subscription.unsubscribe();
     };
@@ -66,28 +64,29 @@ export default function LoginPage() {
 
     const result = await authService.login(email, password);
 
-    if (result.success && result.data?.session) {
-      // Guardar token en localStorage
-      localStorage.setItem("authToken", result.data.session.access_token);
-      localStorage.setItem("userFitControl", JSON.stringify(result.data.user));
+    if (result.success) {
+      // Esta redirección funciona porque authService.login SÍ crea la cookie
       router.push("/dashboard");
     } else {
       setError(result.error || "Credenciales incorrectas");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        // Asegúrate de que redirige a la misma página para que el listener se active
+        redirectTo: `${window.location.origin}/login`,
+      },
     });
 
     if (error) {
       setError(error.message);
       setLoading(false);
     }
-    //Si no hay error, Supabase redirigirá al usuario a Google
   };
 
   return (
