@@ -75,8 +75,8 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        // --- APUNTA A TU BACKEND ---
-        redirectTo: `${process.env.NEXT_PUBLIC_API_URL_BACKEND}/api/auth/google/callback`,
+        //se asegura de que redirige a la misma página para que el listener se active
+        redirectTo: `${window.location.origin}/login`,
       },
     });
 
