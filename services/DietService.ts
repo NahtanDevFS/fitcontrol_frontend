@@ -44,19 +44,17 @@ interface TrackerData {
 }
 
 export const dietService = {
-  //obtiene el plan de dieta completo, la racha y el calendario de un usuario.
-
+  //obtiene el plan de dieta completo, la racha y el calendario de un usuario
   getDietPlan: (userId: string) => {
     return api.get<DietaCompletaResponse>(`/dieta/completa/${userId}`);
   },
 
-  //Añade un nuevo alimento a la dieta.
-
+  //Añade un nuevo alimento a la dieta
   addFood: (payload: AddFoodPayload) => {
     return api.post<AlimentoDetalle>("/dieta-alimento-detalle", payload);
   },
 
-  //Actualiza un alimento existente.
+  //Actualiza un alimento existente
   updateFood: (foodId: number, payload: Partial<UpdateFoodPayload>) => {
     return api.put<AlimentoDetalle>(
       `/dieta-alimento-detalle/${foodId}`,
@@ -64,23 +62,22 @@ export const dietService = {
     );
   },
 
-  //Elimina un alimento de la dieta.
-
+  //Elimina un alimento de la dieta
   deleteFood: (foodId: number) => {
     return api.delete(`/dieta-alimento-detalle/${foodId}`);
   },
 
-  //Obtiene el estado del tracker de dieta para el día actual.
+  //Obtiene el estado del tracker de dieta para el día actual
   getTodayDietTracker: (userId: string) => {
     return api.get<TrackerData>(`/tracker/dieta/hoy/${userId}`);
   },
 
-  //Actualiza el estado de cumplimiento de una comida individual.
+  //Actualiza el estado de cumplimiento de una comida individual
   updateMealCompliance: (complianceId: number, cumplido: boolean) => {
     return api.put(`/cumplimiento-dieta/${complianceId}`, { cumplido });
   },
 
-  //Actualiza el estado de cumplimiento para todo el día.
+  //Actualiza el estado de cumplimiento para todo el día
   updateDayCompliance: (dayComplianceId: number, cumplido: boolean) => {
     return api.put(`/cumplimiento-dieta-dia/${dayComplianceId}`, { cumplido });
   },

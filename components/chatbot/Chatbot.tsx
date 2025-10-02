@@ -10,12 +10,12 @@ const Chatbot = () => {
     script.defer = true;
     script.id = process.env.NEXT_PUBLIC_CHATBASE_ID!; //Le damos un ID para evitar duplicados
 
-    //Evitamos añadir el script múltiples veces si el componente se re-renderiza
+    //Evita añadir el script múltiples veces si el componente se re-renderiza
     if (!document.getElementById(process.env.NEXT_PUBLIC_CHATBASE_ID!)) {
       document.body.appendChild(script);
     }
 
-    //Configuramos el chatbot una vez que el script está listo
+    //Configura el chatbot una vez que el script está listo
     window.chatbaseConfig = {
       chatbotId: process.env.NEXT_PUBLIC_CHATBASE_ID,
     };
@@ -26,7 +26,7 @@ const Chatbot = () => {
         process.env.NEXT_PUBLIC_CHATBASE_ID!
       );
       if (existingScript) {
-        //No lo eliminamos para que el chat persista, pero podrías hacerlo si quisieras
+        //No se elimina para que el chat persista, pero se podria hacer en caso de ser necesario
       }
     };
   }, []);

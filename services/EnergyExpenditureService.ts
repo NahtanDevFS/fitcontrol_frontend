@@ -12,12 +12,12 @@ type UpsertPayload = Omit<
 >;
 
 export const energyExpenditureService = {
-  //Obtiene los datos de gasto energético de un usuario.
+  //Obtiene los datos de gasto energético de un usuario
   getGastoEnergetico: (userId: string) => {
     return api.get<GastoEnergeticoData>(`/gasto-energetico/${userId}`);
   },
 
-  //Calcula y guarda los datos de gasto energético de un usuario.
+  //Calcula y guarda los datos de gasto energético de un usuario
   upsertGastoEnergetico: (payload: UpsertPayload) => {
     return api.post<GastoEnergeticoData>("/gasto-energetico", payload);
   },

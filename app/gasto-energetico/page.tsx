@@ -141,9 +141,9 @@ function CalculationForm({
 
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
-    let nPesoKg = Number(peso); //Asumimos que el peso está en kg por defecto
+    let nPesoKg = Number(peso); //Asume que el peso está en kg por defecto
 
-    //Si la unidad es libras, convertimos el valor del input a kg para los cálculos
+    //Si la unidad es libras, convierte el valor del input a kg para los cálculos
     if (unidadPeso === "lbs") {
       nPesoKg = Number(peso) / KG_TO_LBS;
     }

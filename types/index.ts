@@ -72,7 +72,7 @@ export interface Dieta {
   id_dieta: number;
   id_usuario: string;
   nombre_dieta: string;
-  // Usamos un objeto anidado para un acceso más fácil: dias['Lunes']['Desayuno']
+  //Usamos un objeto anidado para un acceso más fácil: dias['Lunes']['Desayuno']
   dias: { [key: string]: { [key: string]: TiempoComida } };
 }
 
