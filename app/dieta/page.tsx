@@ -332,18 +332,18 @@ function DailyDietTracker({
     );
   }
 
-  //Si no está cumplido, verificamos si hay comidas
+  //Si no está cumplido verificamos si hay comidas
   //si no hay, es un día de descanso o "cheat day"
   if (comidasDeHoy.length === 0) {
     return (
       <div className="tracker-container">
         <h3>Hoy es un Cheat Day</h3>
-        <p>No tienes comidas registradas para hoy</p>
+        <h3>Aprovecha a comer lo que quieras</h3>
       </div>
     );
   }
 
-  //Si no está cumplido y sí hay comidas, mostramos la lista.
+  //Si no está cumplido y sí hay comidas mostramos la lista
   const allMealsChecked = comidasDeHoy.every((c) => c.cumplido);
 
   return (

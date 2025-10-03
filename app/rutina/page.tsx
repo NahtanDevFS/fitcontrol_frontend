@@ -242,7 +242,7 @@ function DailyRoutineTracker({
     return (
       <div className="tracker-container">
         <h3>Hoy es tu día de descanso</h3>
-        <p>Aprovecha para recuperar energías.</p>
+        <h3>Aprovecha para recuperar energías</h3>
       </div>
     );
   const todosCompletados = ejercicios.every((ej) => ej.completado);

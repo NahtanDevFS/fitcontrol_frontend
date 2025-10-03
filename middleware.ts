@@ -7,7 +7,6 @@ export function middleware(request: NextRequest) {
     request.cookies.get("authToken")?.value ||
     request.headers.get("authorization")?.split(" ")[1]; //También verifica el header
 
-  //Rutas públicas que no requieren autenticación
   const publicRoutes = [
     "/login",
     "/register",
@@ -26,12 +25,12 @@ export function middleware(request: NextRequest) {
     "/background2.png", //Ruta directa a mi imagen de fondo
   ];
 
-  //Si es un archivo estático o imagen, permitir el acceso
+  //Si es un archivo estático o imagen permitir el acceso
   if (staticFiles.some((staticPath) => pathname.startsWith(staticPath))) {
     return NextResponse.next();
   }
 
-  //Si el usuario está en una ruta pública y tiene token, redirigir al dashboard
+  //Si el usuario está en una ruta pública y tiene token redirigir al dashboard
   if (publicRoutes.includes(pathname) && token) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
