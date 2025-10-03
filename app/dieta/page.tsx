@@ -1,30 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Dieta,
-  TiempoComida,
-  AlimentoDetalle,
-  CumplimientoDietaDia,
-} from "@/types";
+import { Dieta, AlimentoDetalle } from "@/types";
 import Swal from "sweetalert2";
 import { useTheme } from "@/components/ThemeContext";
 import "./dieta.css";
 import { dietService } from "@/services/DietService";
 
-//tipos
-interface UserInfo {
-  id: string;
-}
-
 interface ModalData {
   dia: string;
   tiempo: string;
-  foodToEdit?: AlimentoDetalle; //Prop opcional para editar
-}
-
-interface MealStatus extends TiempoComida {
-  cumplido: boolean;
+  foodToEdit?: AlimentoDetalle;
 }
 
 const DIAS_SEMANA = [

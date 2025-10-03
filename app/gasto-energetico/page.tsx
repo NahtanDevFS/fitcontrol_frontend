@@ -141,7 +141,6 @@ function CalculationForm({
 
     let nPesoKg = Number(peso);
 
-    //Si es libras convierte el valor del input a kg
     if (unidadPeso === "lbs") {
       nPesoKg = Number(peso) / KG_TO_LBS;
     }
