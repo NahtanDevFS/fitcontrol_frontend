@@ -62,8 +62,7 @@ export default function LoginPage() {
     const result = await authService.login(email, password);
 
     if (result.success) {
-      //Esta redirección funciona porque authService.login sí crea la cookie
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } else {
       setError(result.error || "Credenciales incorrectas");
       setLoading(false);
@@ -75,7 +74,6 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        //se asegura de que redirige a la misma página para que el listener se active
         redirectTo: `${window.location.origin}/login`,
       },
     });

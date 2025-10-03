@@ -44,13 +44,11 @@ export default function GastoEnergeticoPage() {
       const userData: UserInfo = JSON.parse(storedUser);
       setUserId(userData.id);
 
-      //se obtiene el gasto energético y perfil
       const [gastoResponse, profileResponse] = await Promise.all([
         energyExpenditureService.getGastoEnergetico(userData.id),
         profileService.getProfileData(userData.id),
       ]);
 
-      //se actualiza la unidad según el peso del perfil
       if (profileResponse.success && profileResponse.data) {
         setUnidadPeso(profileResponse.data.unidad_peso);
       }
@@ -97,12 +95,12 @@ export default function GastoEnergeticoPage() {
         <CalculationForm
           userId={userId!}
           initialData={datosGuardados}
-          unidadPeso={unidadPeso} //Pasamos la preferencia al formulario
+          unidadPeso={unidadPeso}
           onSuccess={handleSuccess}
           darkMode={darkMode}
         />
       ) : (
-        <ResultsDisplay data={datosGuardados} unidadPeso={unidadPeso} /> //Pasamos la preferencia a los resultados
+        <ResultsDisplay data={datosGuardados} unidadPeso={unidadPeso} />
       )}
     </div>
   );
@@ -141,9 +139,9 @@ function CalculationForm({
 
     const swalTheme = { customClass: { popup: darkMode ? "swal-dark" : "" } };
 
-    let nPesoKg = Number(peso); //Asume que el peso está en kg por defecto
+    let nPesoKg = Number(peso);
 
-    //Si la unidad es libras, convierte el valor del input a kg para los cálculos
+    //Si es libras convierte el valor del input a kg
     if (unidadPeso === "lbs") {
       nPesoKg = Number(peso) / KG_TO_LBS;
     }
@@ -157,7 +155,6 @@ function CalculationForm({
       nivel_actividad: Number(actividad),
     };
 
-    //llamada a la API para calcular y guardar
     const response = await energyExpenditureService.upsertGastoEnergetico(
       payload
     );

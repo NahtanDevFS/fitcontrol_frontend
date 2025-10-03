@@ -4,30 +4,50 @@ import { useEffect } from "react";
 
 const Chatbot = () => {
   useEffect(() => {
-    //Esta configuración carga el script de Chatbase en la página
+    const chatbotId = process.env.NEXT_PUBLIC_CHATBASE_ID;
+
+    if (!chatbotId) {
+      console.error("Chatbase ID no está configurado.");
+      return;
+    }
+
+    // Esta configuración carga el script de Chatbase en la página
     const script = document.createElement("script");
     script.src = "https://www.chatbase.co/embed.min.js";
     script.defer = true;
-    script.id = process.env.NEXT_PUBLIC_CHATBASE_ID!; //Le damos un ID para evitar duplicados
+    script.id = chatbotId; // Le damos un ID para evitar duplicados
 
-    //Evita añadir el script múltiples veces si el componente se re-renderiza
-    if (!document.getElementById(process.env.NEXT_PUBLIC_CHATBASE_ID!)) {
+    // Evita añadir el script múltiples veces si el componente se re-renderiza
+    if (!document.getElementById(chatbotId)) {
       document.body.appendChild(script);
     }
 
-    //Configura el chatbot una vez que el script está listo
+    // Configura el chatbot una vez que el script está listo
     window.chatbaseConfig = {
-      chatbotId: process.env.NEXT_PUBLIC_CHATBASE_ID,
+      chatbotId: chatbotId,
     };
 
-    //Limpieza al desmontar el componente
+    // Limpieza al desmontar el componente
     return () => {
-      const existingScript = document.getElementById(
-        process.env.NEXT_PUBLIC_CHATBASE_ID!
-      );
+      // Elimina el script del chatbot
+      const existingScript = document.getElementById(chatbotId);
       if (existingScript) {
-        //No se elimina para que el chat persista, pero se podria hacer en caso de ser necesario
+        existingScript.remove();
       }
+
+      // Elimina el widget del chatbot del DOM
+      const widget = document.getElementById("chatbase-bubble-window");
+      if (widget) {
+        widget.remove();
+      }
+      // Elimina el botón del chatbot del DOM
+      const bubbleButton = document.getElementById("chatbase-bubble-button");
+      if (bubbleButton) {
+        bubbleButton.remove();
+      }
+
+      // Limpia la configuración global
+      delete window.chatbaseConfig;
     };
   }, []);
 

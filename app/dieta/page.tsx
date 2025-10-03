@@ -391,7 +391,6 @@ function DietStreakTracker({
 }) {
   const fillerDays = [];
   if (calendario.length > 0) {
-    // Se crea un objeto Date para obtener el día de la semana, los strings de fecha "YYYY-MM-DD" se interpretan como UTC, por lo que uso getUTCDay() para obtener el día correcto sin problemas de zona horaria
     const firstDayOfWeek = new Date(calendario[0].fecha).getUTCDay();
     for (let i = 0; i < firstDayOfWeek; i++) {
       fillerDays.push(
@@ -556,7 +555,6 @@ function AddFoodModal({
 
   const handleSaveFood = async () => {
     if (!nutrition || !selectedFood?.description) {
-      // <-- Verificación de seguridad
       Swal.fire({
         ...swalTheme,
         icon: "warning",
@@ -644,7 +642,7 @@ function AddFoodModal({
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Busca un alimento (ej: Pollo, Manzana)"
+                placeholder="Busca un alimento (pollo/chicken, manzana/apple...)"
                 autoFocus
               />
               <button
