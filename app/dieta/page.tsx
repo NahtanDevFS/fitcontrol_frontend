@@ -87,7 +87,6 @@ export default function DietaPage() {
       cancelButtonText: "Cancelar",
     });
     if (result.isConfirmed) {
-      //llamada al servicio
       const response = await dietService.deleteFood(alimentoId);
 
       if (!response.success) {
@@ -431,7 +430,17 @@ interface AddFoodModalProps {
   darkMode: boolean;
 }
 
-//sub-componente modal para añadir alimentos con búsqueda priorizada
+const limpiarDescripcion = (descripcion: string) => {
+  if (!descripcion) return "";
+  return descripcion
+    .replace(/SR Legacy/gi, "")
+    .replace(/,/g, ", ")
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (l) => l.toUpperCase())
+    .trim();
+};
+
 function AddFoodModal({
   dietaId,
   dayName,
@@ -457,7 +466,6 @@ function AddFoodModal({
 
       setQuantity(foodToEdit.gramos_alimento);
 
-      // Recreamos el objeto de nutrición a partir de los datos guardados por 100g
       const multiplier = foodToEdit.gramos_alimento / 100;
       if (multiplier > 0) {
         setNutrition({
@@ -481,17 +489,10 @@ function AddFoodModal({
     try {
       let url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(
         query
-      )}&dataType=SR%20Legacy&pageSize=10`;
+      )}&pageSize=10`;
       let response = await fetch(url);
       let data = await response.json();
 
-      if (!data.foods || data.foods.length === 0) {
-        url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(
-          query
-        )}&pageSize=10`;
-        response = await fetch(url);
-        data = await response.json();
-      }
       setResults(data.foods || []);
     } catch (error) {
       Swal.fire({
@@ -552,8 +553,10 @@ function AddFoodModal({
     setLoading(true);
     const multiplier = quantity / 100;
 
+    const nombreLimpio = limpiarDescripcion(selectedFood.description); // Usamos la función
+
     const foodData = {
-      nombre_alimento: `${quantity}g de ${selectedFood.description}`,
+      nombre_alimento: `${quantity}g de ${nombreLimpio}`, // <-- NOMBRE LIMPIO
       calorias_alimento: nutrition.calories * multiplier,
       proteina_alimento: nutrition.protein * multiplier,
       grasas_alimento: nutrition.fat * multiplier,
@@ -564,13 +567,11 @@ function AddFoodModal({
     try {
       let response;
       if (foodToEdit) {
-        //llamada para actualizar
         response = await dietService.updateFood(
           foodToEdit.id_dieta_alimento_detalle!,
           foodData
         );
       } else {
-        //llamada para crear
         const payload = {
           ...foodData,
           id_dieta: dietaId,
@@ -605,7 +606,6 @@ function AddFoodModal({
     setLoading(false);
   };
 
-  // Determinamos qué vista mostrar: búsqueda o detalles
   const showDetailsView = selectedFood || foodToEdit;
 
   return (
@@ -645,7 +645,8 @@ function AddFoodModal({
                   key={food.fdcId || index}
                   onClick={() => handleSelectFood(food)}
                 >
-                  {food.description}
+                  {limpiarDescripcion(food.description)}{" "}
+                  {/* <-- NOMBRE LIMPIO */}
                   <small className="food-category">{food.dataType}</small>
                 </li>
               ))}
@@ -653,7 +654,10 @@ function AddFoodModal({
           </>
         ) : (
           <div className="nutrition-details">
-            <h3>{selectedFood?.description || "Detalles del Alimento"}</h3>
+            <h3>
+              {limpiarDescripcion(selectedFood?.description) ||
+                "Detalles del Alimento"}
+            </h3>
 
             <div className="quantity-selector">
               <label htmlFor="quantity">Cantidad (gramos):</label>
