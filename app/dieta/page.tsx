@@ -304,8 +304,6 @@ function DailyDietTracker({
     );
   }
 
-  //verificamos si el día ya está cumplido.
-  //Si es así, mostramos el mensaje de éxito y terminamos.
   if (diaCumplido) {
     return (
       <div className="tracker-container">
@@ -317,8 +315,6 @@ function DailyDietTracker({
     );
   }
 
-  //Si no está cumplido verificamos si hay comidas
-  //si no hay, es un día de descanso o "cheat day"
   if (comidasDeHoy.length === 0) {
     return (
       <div className="tracker-container">
@@ -328,7 +324,6 @@ function DailyDietTracker({
     );
   }
 
-  //Si no está cumplido y sí hay comidas mostramos la lista
   const allMealsChecked = comidasDeHoy.every((c) => c.cumplido);
 
   return (
@@ -487,13 +482,13 @@ function AddFoodModal({
     setSelectedFood(null);
     setNutrition(null);
     try {
-      let url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(
+      const URL = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(
         query
       )}&pageSize=10`;
-      let response = await fetch(url);
-      let data = await response.json();
+      const RESPONSE = await fetch(URL);
+      const DATA = await RESPONSE.json();
 
-      setResults(data.foods || []);
+      setResults(DATA.foods || []);
     } catch (error) {
       Swal.fire({
         ...swalTheme,
@@ -553,10 +548,10 @@ function AddFoodModal({
     setLoading(true);
     const multiplier = quantity / 100;
 
-    const nombreLimpio = limpiarDescripcion(selectedFood.description); // Usamos la función
+    const nombreLimpio = limpiarDescripcion(selectedFood.description);
 
     const foodData = {
-      nombre_alimento: `${quantity}g de ${nombreLimpio}`, // <-- NOMBRE LIMPIO
+      nombre_alimento: `${quantity}g de ${nombreLimpio}`,
       calorias_alimento: nutrition.calories * multiplier,
       proteina_alimento: nutrition.protein * multiplier,
       grasas_alimento: nutrition.fat * multiplier,
